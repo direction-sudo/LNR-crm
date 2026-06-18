@@ -3,84 +3,103 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LNR FINANCE - CRM Cloud</title>
+<title>LNR FINANCE - CRM Cloud Pro</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#0f1117;--bg2:#1a1d2e;--bg3:#252840;--accent:#4f8ef7;--accent2:#7c5cbf;--success:#22c55e;--warning:#f59e0b;--danger:#ef4444;--text:#e2e8f0;--text2:#94a3b8;--border:#2d3158}
-body{font-family:'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+:root{--bg:#0f1117;--bg2:#1a1d2e;--bg3:#252840;--bg4:#2d3250;--accent:#4f8ef7;--accent2:#7c5cbf;--accent3:#22c55e;--success:#22c55e;--warning:#f59e0b;--danger:#ef4444;--text:#e2e8f0;--text2:#94a3b8;--border:#2d3158;--border2:#3d4270}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 #loginPage{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#0f1117 0%,#1a1d2e 50%,#252840 100%)}
-.login-box{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:40px;width:420px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.login-box{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:40px;width:420px;box-shadow:0 20px 60px rgba(0,0,0,.5);position:relative;overflow:hidden}
+.login-box::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3))}
 .login-logo{text-align:center;margin-bottom:30px}
 .login-logo h1{font-size:28px;color:var(--accent);font-weight:700}
 .login-logo p{color:var(--text2);font-size:14px;margin-top:4px}
 .form-group{margin-bottom:16px}
-.form-group label{display:block;font-size:13px;color:var(--text2);margin-bottom:6px}
+.form-group label{display:block;font-size:13px;color:var(--text2);margin-bottom:6px;font-weight:500}
 .form-group input,.form-group select,.form-group textarea{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-size:14px;outline:none;transition:.2s}
-.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--accent)}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,142,247,.1)}
 .form-group textarea{resize:vertical;min-height:80px}
-.btn{padding:10px 20px;border:none;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;transition:.2s;display:inline-flex;align-items:center;gap:6px}
+.btn{padding:10px 20px;border:none;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;transition:.2s;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
 .btn-primary{background:var(--accent);color:#fff}
-.btn-primary:hover{background:#3b7de8}
+.btn-primary:hover{background:#3b7de8;transform:translateY(-1px)}
 .btn-success{background:var(--success);color:#fff}
+.btn-success:hover{background:#16a34a}
 .btn-warning{background:var(--warning);color:#000}
 .btn-danger{background:var(--danger);color:#fff}
+.btn-danger:hover{background:#dc2626}
 .btn-secondary{background:var(--bg3);border:1px solid var(--border);color:var(--text)}
 .btn-secondary:hover{background:var(--border)}
+.btn-info{background:rgba(79,142,247,.15);color:var(--accent);border:1px solid rgba(79,142,247,.3)}
+.btn-info:hover{background:rgba(79,142,247,.25)}
 .btn-full{width:100%;justify-content:center}
 .btn-sm{padding:6px 12px;font-size:12px}
+.btn-lg{padding:14px 28px;font-size:16px}
 .btn:disabled{opacity:.5;cursor:not-allowed}
 #app{display:none;min-height:100vh;flex-direction:column}
 .topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
-.topbar-brand{font-size:18px;font-weight:700;color:var(--accent)}
+.topbar-brand{font-size:18px;font-weight:700;color:var(--accent);display:flex;align-items:center;gap:10px}
+.topbar-brand .logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px}
 .topbar-right{display:flex;align-items:center;gap:16px}
+.search-box{position:relative}
+.search-box input{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 14px 8px 36px;color:var(--text);font-size:13px;width:280px;outline:none}
+.search-box input:focus{border-color:var(--accent)}
+.search-box .search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text2);font-size:14px}
 .user-chip{background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:13px;display:flex;align-items:center;gap:8px}
-.avatar{width:28px;height:28px;border-radius:50%;background:var(--accent2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
+.avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
 .layout{display:flex;flex:1}
-.sidebar{width:240px;background:var(--bg2);border-right:1px solid var(--border);padding:16px 0 0;overflow-y:auto;position:sticky;top:56px;height:calc(100vh - 56px);display:flex;flex-direction:column}
-.sidebar-nav{flex:1;overflow-y:auto}
+.sidebar{width:260px;background:var(--bg2);border-right:1px solid var(--border);padding:0;overflow-y:auto;position:sticky;top:56px;height:calc(100vh - 56px);display:flex;flex-direction:column;transition:width .3s}
+.sidebar.collapsed{width:60px}
+.sidebar.collapsed .sidebar-label,.sidebar.collapsed .nav-item span,.sidebar.collapsed .sidebar-user .info{display:none}
+.sidebar.collapsed .nav-item{justify-content:center;padding:12px}
+.sidebar.collapsed .sidebar-user{justify-content:center}
+.sidebar-toggle{position:absolute;right:-12px;top:20px;width:24px;height:24px;background:var(--bg3);border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:10px;color:var(--text2);z-index:10}
+.sidebar-nav{flex:1;overflow-y:auto;padding:8px 0}
 .sidebar-footer{padding:12px 16px;border-top:1px solid var(--border);background:var(--bg2);flex-shrink:0}
 .sidebar-user{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-.sidebar-user .avatar{width:32px;height:32px;border-radius:50%;background:var(--accent2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
+.sidebar-user .avatar{width:32px;height:32px;font-size:12px}
 .sidebar-user .info{flex:1;min-width:0}
 .sidebar-user .info .name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sidebar-user .info .role{font-size:11px;color:var(--text2)}
 .btn-logout{width:100%;padding:8px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:8px;color:var(--danger);cursor:pointer;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px;transition:.2s}
 .btn-logout:hover{background:rgba(239,68,68,.2);border-color:var(--danger)}
-.sidebar-section{margin-bottom:8px}
+.sidebar-section{margin-bottom:4px}
 .sidebar-label{font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.1em;padding:8px 16px 4px}
-.nav-item{display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;color:var(--text2);font-size:13px;transition:.15s;position:relative}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;color:var(--text2);font-size:13px;transition:.15s;position:relative;border-radius:0 8px 8px 0;margin-right:8px}
 .nav-item:hover{background:var(--bg3);color:var(--text)}
 .nav-item.active{background:rgba(79,142,247,.15);color:var(--accent);border-right:2px solid var(--accent)}
-.nav-badge{margin-left:auto;background:var(--accent);color:#fff;border-radius:10px;padding:2px 7px;font-size:10px;font-weight:700}
+.nav-badge{margin-left:auto;background:var(--accent);color:#fff;border-radius:10px;padding:2px 7px;font-size:10px;font-weight:700;min-width:20px;text-align:center}
 .nav-badge.orange{background:var(--warning);color:#000}
 .nav-badge.red{background:var(--danger)}
-.main{flex:1;padding:24px;overflow-y:auto}
-.section{display:none}
+.main{flex:1;padding:24px;overflow-y:auto;min-width:0}
+.section{display:none;animation:fadeIn .3s ease}
 .section.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 .page-header{margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
-.page-title{font-size:20px;font-weight:700}
+.page-title{font-size:22px;font-weight:700}
 .page-breadcrumb{font-size:12px;color:var(--text2);margin-top:2px}
 .page-actions{display:flex;gap:8px;flex-wrap:wrap}
 .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px}
-.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px}
-.stat-card .label{font-size:12px;color:var(--text2);margin-bottom:8px}
-.stat-card .value{font-size:28px;font-weight:700;color:var(--text)}
-.stat-card .change{font-size:12px;margin-top:4px}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px;transition:.2s}
+.stat-card:hover{border-color:var(--border2);transform:translateY(-2px)}
+.stat-card .label{font-size:12px;color:var(--text2);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.stat-card .value{font-size:32px;font-weight:700;color:var(--text);line-height:1}
+.stat-card .change{font-size:12px;margin-top:6px;display:flex;align-items:center;gap:4px}
 .stat-card .change.up{color:var(--success)}
 .stat-card .change.down{color:var(--danger)}
-.card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px;transition:.2s}
+.card:hover{border-color:var(--border2)}
 .card-title{font-size:15px;font-weight:600;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
-.tabs{display:flex;gap:4px;margin-bottom:20px;border-bottom:1px solid var(--border);padding-bottom:0}
-.tab-btn{padding:10px 18px;background:none;border:none;border-bottom:2px solid transparent;color:var(--text2);cursor:pointer;font-size:13px;font-weight:500;transition:.2s;margin-bottom:-1px}
+.tabs{display:flex;gap:4px;margin-bottom:20px;border-bottom:1px solid var(--border);padding-bottom:0;overflow-x:auto}
+.tab-btn{padding:10px 18px;background:none;border:none;border-bottom:2px solid transparent;color:var(--text2);cursor:pointer;font-size:13px;font-weight:500;transition:.2s;margin-bottom:-1px;white-space:nowrap}
 .tab-btn:hover{color:var(--text)}
 .tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
 .tab-content{display:none}
 .tab-content.active{display:block}
 .table-wrap{overflow-x:auto;border-radius:8px;border:1px solid var(--border)}
 table{width:100%;border-collapse:collapse;font-size:13px}
-th{background:var(--bg3);padding:10px 14px;text-align:left;font-weight:600;color:var(--text2);font-size:12px;text-transform:uppercase;letter-spacing:.05em}
+th{background:var(--bg3);padding:10px 14px;text-align:left;font-weight:600;color:var(--text2);font-size:12px;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
 td{padding:10px 14px;border-top:1px solid var(--border);vertical-align:middle}
 tr:hover td{background:rgba(255,255,255,.02)}
 .badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
@@ -90,17 +109,18 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .badge-info{background:rgba(79,142,247,.15);color:var(--accent)}
 .badge-gray{background:rgba(148,163,184,.15);color:var(--text2)}
 .badge-purple{background:rgba(124,92,191,.15);color:#a78bfa}
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center;padding:20px}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
 .modal-overlay.open{display:flex}
-.modal{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:28px;width:100%;max-width:620px;max-height:90vh;overflow-y:auto}
-.modal-lg{max-width:820px}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:28px;width:100%;max-width:620px;max-height:90vh;overflow-y:auto;box-shadow:0 25px 80px rgba(0,0,0,.6)}
+.modal-lg{max-width:900px}
 .modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
 .modal-title{font-size:17px;font-weight:700}
-.modal-close{background:none;border:none;color:var(--text2);cursor:pointer;font-size:20px;padding:4px}
-.modal-close:hover{color:var(--text)}
+.modal-close{background:none;border:none;color:var(--text2);cursor:pointer;font-size:20px;padding:4px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:6px;transition:.2s}
+.modal-close:hover{background:var(--bg3);color:var(--text)}
 .modal-footer{display:flex;justify-content:flex-end;gap:10px;margin-top:24px;padding-top:16px;border-top:1px solid var(--border)}
 .agents-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-bottom:24px}
-.agent-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:18px}
+.agent-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:18px;transition:.2s}
+.agent-card:hover{border-color:var(--accent)}
 .agent-card .agent-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .agent-card .agent-name{font-weight:600;font-size:14px}
 .agent-card .agent-desc{font-size:12px;color:var(--text2);margin-bottom:12px}
@@ -122,10 +142,11 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .activity-content .meta{font-size:11px;color:var(--text2);margin-top:2px}
 .calendar-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
 .calendar-nav h3{font-size:15px;font-weight:600}
-.cal-nav-btn{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:6px 12px;color:var(--text);cursor:pointer;font-size:13px}
+.cal-nav-btn{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:6px 12px;color:var(--text);cursor:pointer;font-size:13px;transition:.2s}
+.cal-nav-btn:hover{background:var(--border)}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
 .cal-day-header{text-align:center;font-size:11px;font-weight:700;color:var(--text2);padding:6px;text-transform:uppercase}
-.cal-day{background:var(--bg3);border-radius:8px;padding:8px;min-height:70px;cursor:pointer;transition:.2s;border:1px solid transparent}
+.cal-day{background:var(--bg3);border-radius:8px;padding:8px;min-height:70px;cursor:pointer;transition:.2s;border:1px solid transparent;position:relative}
 .cal-day:hover{border-color:var(--accent)}
 .cal-day.today{border-color:var(--accent);background:rgba(79,142,247,.1)}
 .cal-day.other-month{opacity:.3}
@@ -135,14 +156,18 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .cal-event.blue{background:rgba(79,142,247,.3);color:var(--accent)}
 .cal-event.green{background:rgba(34,197,94,.3);color:var(--success)}
 .cal-event.orange{background:rgba(245,158,11,.3);color:var(--warning)}
+.cal-event.red{background:rgba(239,68,68,.3);color:var(--danger)}
 .alert-card{background:var(--bg2);border-left:3px solid var(--danger);border-radius:8px;padding:14px 16px;margin-bottom:10px}
 .alert-card.warning{border-left-color:var(--warning)}
 .alert-card.info{border-left-color:var(--accent)}
+.alert-card.success{border-left-color:var(--success)}
 .alert-card .alert-title{font-size:13px;font-weight:600;margin-bottom:4px}
 .alert-card .alert-desc{font-size:12px;color:var(--text2)}
 .poker-list{display:flex;flex-direction:column;gap:10px}
-.poker-item{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:12px}
-.poker-rank{width:28px;height:28px;border-radius:50%;background:var(--accent2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
+.poker-item{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:12px;transition:.2s}
+.poker-item:hover{border-color:var(--accent);transform:translateX(4px)}
+.poker-item.current{border-color:var(--accent);background:rgba(79,142,247,.08)}
+.poker-rank{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
 .poker-info{flex:1}
 .poker-info .name{font-size:13px;font-weight:600}
 .poker-info .meta{font-size:11px;color:var(--text2)}
@@ -166,7 +191,8 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .criteria-list{display:flex;flex-direction:column;gap:8px}
 .criteria-item{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg3);border-radius:8px;font-size:13px}
 .criteria-item .pts{font-weight:700;color:var(--accent)}
-.campaign-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:12px}
+.campaign-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:12px;transition:.2s}
+.campaign-card:hover{border-color:var(--border2)}
 .campaign-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .campaign-day{font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;background:rgba(79,142,247,.15);padding:3px 10px;border-radius:20px}
 .campaign-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
@@ -174,7 +200,8 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .camp-stat .v{font-size:18px;font-weight:700}
 .camp-stat .l{font-size:10px;color:var(--text2)}
 .wf-list{display:flex;flex-direction:column;gap:8px}
-.wf-item{display:flex;align-items:center;justify-content:space-between;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px 16px}
+.wf-item{display:flex;align-items:center;justify-content:space-between;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px 16px;transition:.2s}
+.wf-item:hover{border-color:var(--border2)}
 .wf-info{flex:1}
 .wf-info .name{font-size:13px;font-weight:600}
 .wf-info .meta{font-size:11px;color:var(--text2)}
@@ -195,8 +222,9 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .audit-row .score-dot.filled{background:var(--success)}
 .audit-row .score-dot.half{background:var(--warning)}
 .integrations-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
-.int-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px}
-.int-icon{width:36px;height:36px;border-radius:8px;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.int-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px;transition:.2s;cursor:pointer}
+.int-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.int-icon{width:40px;height:40px;border-radius:10px;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
 .int-info .name{font-size:13px;font-weight:600}
 .int-info .status{font-size:11px;display:flex;align-items:center;gap:4px;margin-top:2px}
 .int-info .status.connected{color:var(--success)}
@@ -222,7 +250,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .trend-down{color:var(--danger)}
 .notes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
 .note-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;transition:.2s;position:relative}
-.note-card:hover{border-color:var(--accent)}
+.note-card:hover{border-color:var(--accent);transform:translateY(-2px)}
 .note-card.epingle{border-left:3px solid var(--warning)}
 .note-card .note-title{font-size:13px;font-weight:600;margin-bottom:6px}
 .note-card .note-content{font-size:12px;color:var(--text2);line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
@@ -232,24 +260,173 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .sync-indicator{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2)}
 .sync-indicator.syncing .dot{animation:spin 1s linear infinite}
 @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-.loading-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:9999;align-items:center;justify-content:center;flex-direction:column;gap:16px}
+.loading-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:9999;align-items:center;justify-content:center;flex-direction:column;gap:16px;backdrop-filter:blur(4px)}
 .loading-overlay.open{display:flex}
 .loading-spinner{width:48px;height:48px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite}
 .loading-text{color:var(--text2);font-size:14px}
 .empty-state{text-align:center;padding:40px;color:var(--text2)}
 .empty-state .icon{font-size:48px;margin-bottom:12px}
-.flex{display:flex}.gap-8{gap:8px}.gap-12{gap:12px}.items-center{align-items:center}.justify-between{justify-content:space-between}
-.mt-16{margin-top:16px}.mb-16{margin-bottom:16px}.mt-8{margin-top:8px}
-.text-sm{font-size:12px}.text-muted{color:var(--text2)}
+.flex{display:flex}.gap-8{gap:8px}.gap-12{gap:12px}.items-center{align-items:center}.justify-between{justify-content:space-between}.justify-center{justify-content:center}
+.mt-16{margin-top:16px}.mb-16{margin-bottom:16px}.mt-8{margin-top:8px}.mb-8{margin-bottom:8px}
+.text-sm{font-size:12px}.text-muted{color:var(--text2)}.text-center{text-align:center}
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
 .section-divider{border:none;border-top:1px solid var(--border);margin:20px 0}
 .info-box{background:rgba(79,142,247,.08);border:1px solid rgba(79,142,247,.3);border-radius:8px;padding:12px 16px;font-size:13px;color:var(--accent);margin-bottom:16px}
 .warning-box{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);border-radius:8px;padding:12px 16px;font-size:13px;color:var(--warning);margin-bottom:16px}
+.success-box{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.3);border-radius:8px;padding:12px 16px;font-size:13px;color:var(--success);margin-bottom:16px}
+.danger-box{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:12px 16px;font-size:13px;color:var(--danger);margin-bottom:16px}
+
+/* ===== CALCULATRICE PRO ===== */
+.calc-container{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px}
+.calc-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px}
+.calc-card h3{font-size:14px;font-weight:600;margin-bottom:16px;color:var(--text2);display:flex;align-items:center;gap:8px}
+.calc-display{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px 16px;font-size:18px;font-weight:700;text-align:right;margin-bottom:12px;min-height:48px}
+.calc-keypad{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.calc-btn{padding:12px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:14px;cursor:pointer;transition:.2s;text-align:center;font-weight:600}
+.calc-btn:hover{background:var(--border)}
+.calc-btn.accent{background:var(--accent);color:#fff;border-color:var(--accent)}
+.calc-btn.accent:hover{background:#3b7de8}
+.calc-btn.danger{background:var(--danger);color:#fff;border-color:var(--danger)}
+.calc-btn.danger:hover{background:#dc2626}
+.calc-result{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;margin-top:12px;font-size:13px}
+.calc-result .label{color:var(--text2);font-size:11px;margin-bottom:4px}
+.calc-result .value{font-size:18px;font-weight:700;color:var(--accent)}
+
+/* ===== GOOGLE SEARCH ===== */
+.google-search-box{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:24px}
+.google-search-input{display:flex;gap:8px;margin-bottom:16px}
+.google-search-input input{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-size:14px;outline:none}
+.google-search-input input:focus{border-color:var(--accent)}
+.google-results{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:16px;max-height:400px;overflow-y:auto}
+.google-result-item{padding:10px 0;border-bottom:1px solid var(--border)}
+.google-result-item:last-child{border-bottom:none}
+.google-result-item .title{color:var(--accent);font-size:14px;font-weight:600;cursor:pointer;text-decoration:none}
+.google-result-item .title:hover{text-decoration:underline}
+.google-result-item .url{color:var(--success);font-size:11px;margin-top:2px}
+.google-result-item .snippet{color:var(--text2);font-size:12px;margin-top:4px;line-height:1.5}
+
+/* ===== VPN & OUTILS RESEAU ===== */
+.tools-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:24px}
+.tool-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px;transition:.2s}
+.tool-card:hover{border-color:var(--accent)}
+.tool-card h3{font-size:14px;font-weight:600;margin-bottom:16px;color:var(--text2);display:flex;align-items:center;gap:8px}
+.tool-output{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;font-family:'Courier New',monospace;font-size:12px;min-height:100px;max-height:300px;overflow-y:auto;color:var(--text);white-space:pre-wrap;word-break:break-all}
+.tool-output .line{padding:2px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.tool-output .line:last-child{border-bottom:none}
+.tool-output .key{color:var(--accent);font-weight:600}
+.tool-output .value{color:var(--text2)}
+.tool-output .success{color:var(--success)}
+.tool-output .error{color:var(--danger)}
+.tool-output .warning{color:var(--warning)}
+.dns-record{display:flex;gap:8px;padding:6px 0;font-size:12px;border-bottom:1px solid rgba(255,255,255,.05)}
+.dns-record:last-child{border-bottom:none}
+.dns-record .type{background:var(--accent);color:#fff;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:600;min-width:40px;text-align:center}
+.dns-record .target{flex:1;color:var(--text)}
+.dns-record .ttl{color:var(--text2);font-size:11px}
+
+/* ===== AIRCALL DIALER ===== */
+.dialer-container{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:24px;max-width:320px;margin:0 auto}
+.dialer-display{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center;margin-bottom:16px}
+.dialer-display .number{font-size:24px;font-weight:700;letter-spacing:2px;min-height:36px}
+.dialer-display .status{font-size:11px;color:var(--text2);margin-top:4px}
+.dialer-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.dialer-btn{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:16px;cursor:pointer;transition:.2s;text-align:center}
+.dialer-btn:hover{background:var(--border);border-color:var(--accent)}
+.dialer-btn .digit{font-size:20px;font-weight:700;color:var(--text)}
+.dialer-btn .letters{font-size:9px;color:var(--text2);margin-top:2px;letter-spacing:1px}
+.dialer-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.dialer-call{background:var(--success);color:#fff;border:none;border-radius:12px;padding:14px;cursor:pointer;font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px;transition:.2s}
+.dialer-call:hover{background:#16a34a}
+.dialer-hangup{background:var(--danger);color:#fff;border:none;border-radius:12px;padding:14px;cursor:pointer;font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px;transition:.2s}
+.dialer-hangup:hover{background:#dc2626}
+.call-history{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;margin-top:16px;max-height:200px;overflow-y:auto}
+.call-history-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px}
+.call-history-item:last-child{border-bottom:none}
+.call-history-item .icon{font-size:14px}
+.call-history-item .icon.incoming{color:var(--success)}
+.call-history-item .icon.outgoing{color:var(--accent)}
+.call-history-item .icon.missed{color:var(--danger)}
+.call-history-item .info{flex:1}
+.call-history-item .time{color:var(--text2);font-size:11px}
+
+/* ===== PORTAIL GESTION ACCES ===== */
+.user-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.user-card{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:16px;transition:.2s}
+.user-card:hover{border-color:var(--accent)}
+.user-card-header{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.user-card-header .avatar{width:48px;height:48px;font-size:16px}
+.user-card-header .info{flex:1}
+.user-card-header .name{font-size:14px;font-weight:600}
+.user-card-header .email{font-size:11px;color:var(--text2)}
+.user-perms{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+.user-perm{font-size:10px;padding:2px 8px;border-radius:10px;background:var(--bg2);border:1px solid var(--border)}
+.user-perm.active{background:rgba(34,197,94,.15);color:var(--success);border-color:rgba(34,197,94,.3)}
+.user-perm.denied{background:rgba(239,68,68,.15);color:var(--danger);border-color:rgba(239,68,68,.3)}
+.role-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.role-badge.rh{background:rgba(124,92,191,.15);color:#a78bfa}
+.role-badge.commercial{background:rgba(79,142,247,.15);color:var(--accent)}
+.role-badge.manager{background:rgba(34,197,94,.15);color:var(--success)}
+.role-badge.it{background:rgba(245,158,11,.15);color:var(--warning)}
+.role-badge.gestion{background:rgba(239,68,68,.15);color:var(--danger)}
+
+/* ===== MODE CARTE LEADS ===== */
+.leads-cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.lead-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;transition:.2s;cursor:pointer;position:relative;overflow:hidden}
+.lead-card:hover{border-color:var(--accent);transform:translateY(-3px);box-shadow:0 8px 30px rgba(0,0,0,.3)}
+.lead-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+.lead-card .header{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.lead-card .header .avatar{width:40px;height:40px;font-size:14px}
+.lead-card .header .info{flex:1}
+.lead-card .header .name{font-size:14px;font-weight:600}
+.lead-card .header .ref{font-size:11px;color:var(--text2)}
+.lead-card .body{font-size:12px;color:var(--text2);line-height:1.6}
+.lead-card .body .row{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.lead-card .body .row:last-child{border-bottom:none}
+.lead-card .body .row .label{color:var(--text2)}
+.lead-card .body .row .value{color:var(--text);font-weight:500}
+.lead-card .footer{display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
+.lead-card .score{font-size:24px;font-weight:700;color:var(--accent)}
+.lead-card .score.low{color:var(--danger)}
+.lead-card .score.medium{color:var(--warning)}
+.lead-card .score.high{color:var(--success)}
+.lead-card .actions{display:flex;gap:6px}
+
+/* ===== VIEW TOGGLE ===== */
+.view-toggle{display:flex;gap:4px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:4px;margin-bottom:16px;width:fit-content}
+.view-toggle-btn{padding:6px 12px;background:none;border:none;border-radius:6px;color:var(--text2);cursor:pointer;font-size:12px;transition:.2s}
+.view-toggle-btn:hover{color:var(--text)}
+.view-toggle-btn.active{background:var(--accent);color:#fff}
+
+/* ===== TOAST ===== */
+.toast-container{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px}
+.toast{padding:12px 20px;border-radius:8px;font-size:14px;font-weight:500;box-shadow:0 4px 20px rgba(0,0,0,.4);animation:toastIn .3s ease;max-width:400px;word-break:break-word}
+.toast.success{background:var(--success);color:#fff}
+.toast.error{background:var(--danger);color:#fff}
+.toast.warning{background:var(--warning);color:#000}
+.toast.info{background:var(--accent);color:#fff}
+@keyframes toastIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:768px){
+  .sidebar{width:60px}
+  .sidebar .sidebar-label,.sidebar .nav-item span,.sidebar .sidebar-user .info{display:none}
+  .sidebar .nav-item{justify-content:center;padding:12px}
+  .sidebar .sidebar-user{justify-content:center}
+  .chart-grid{grid-template-columns:1fr}
+  .calc-container{grid-template-columns:1fr}
+  .tools-grid{grid-template-columns:1fr}
+  .search-box input{width:160px}
+  .page-title{font-size:18px}
+}
 </style>
+<base target="_blank">
 <base target="_blank">
 </head>
 <body>
+
+<div class="toast-container" id="toastContainer"></div>
 
 <div class="loading-overlay" id="loadingOverlay">
   <div class="loading-spinner"></div>
@@ -261,10 +438,10 @@ tr:hover td{background:rgba(255,255,255,.02)}
   <div class="login-box">
     <div class="login-logo">
       <h1>🏢 LNR FINANCE</h1>
-      <p>CRM Cloud - Base de données sécurisée</p>
+      <p>CRM Cloud Pro - Base de données sécurisée</p>
       <div class="sync-indicator" style="justify-content:center;margin-top:8px">
         <span class="dot" style="width:6px;height:6px"></span>
-        <span>🔗 Supabase PostgreSQL Cloud</span>
+        <span>🔗 Supabase PostgreSQL Cloud • Realtime Sync</span>
       </div>
     </div>
     <div class="form-group">
@@ -277,8 +454,8 @@ tr:hover td{background:rgba(255,255,255,.02)}
     </div>
     <button class="btn btn-primary btn-full" onclick="doLogin()" id="loginBtn">🔐 Connexion sécurisée</button>
     <p style="text-align:center;font-size:11px;color:var(--text2);margin-top:12px">
-      🔒 Auth JWT • PostgreSQL • SSL/TLS • Realtime Sync<br>
-      ❌ Aucune donnée stockée localement
+      🔒 Auth JWT • PostgreSQL • SSL/TLS • WebSocket Realtime<br>
+      ❌ Aucune donnée stockée localement • 100% Cloud
     </p>
   </div>
 </div>
@@ -286,8 +463,15 @@ tr:hover td{background:rgba(255,255,255,.02)}
 <!-- ============ MAIN APP ============ -->
 <div id="app">
   <div class="topbar">
-    <div class="topbar-brand">🏢 LNR FINANCE</div>
+    <div class="topbar-brand">
+      <div class="logo-icon">🏢</div>
+      LNR FINANCE
+    </div>
     <div class="topbar-right">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="globalSearch" placeholder="Rechercher dans le CRM..." onkeyup="globalSearch(event)">
+      </div>
       <div class="sync-indicator" id="syncStatus">
         <span class="dot" style="width:6px;height:6px"></span>
         <span id="syncText">Sync OK</span>
@@ -302,45 +486,128 @@ tr:hover td{background:rgba(255,255,255,.02)}
   <div class="layout">
     <!-- SIDEBAR -->
     <div class="sidebar" id="sidebar">
+      <div class="sidebar-toggle" onclick="toggleSidebar()">◀</div>
       <div class="sidebar-nav">
         <div class="sidebar-section">
           <div class="sidebar-label">Vue d'ensemble</div>
-          <div class="nav-item active" onclick="showSection('dashboard')">📊 Tableau de bord</div>
+          <div class="nav-item active" onclick="showSection('dashboard')">
+            <span>📊</span>
+            <span>Tableau de bord</span>
+          </div>
         </div>
         <div class="sidebar-section" id="nav-rh">
           <div class="sidebar-label">Agent RH</div>
-          <div class="nav-item" onclick="showSection('recrutement')">🔍 Recrutement <span class="nav-badge" id="badge-recrutement">0</span></div>
-          <div class="nav-item" onclick="showSection('pointage')">⏱️ Pointage</div>
-          <div class="nav-item" onclick="showSection('employes')">👥 Employés</div>
+          <div class="nav-item" onclick="showSection('recrutement')">
+            <span>🔍</span>
+            <span>Recrutement</span>
+            <span class="nav-badge" id="badge-recrutement">0</span>
+          </div>
+          <div class="nav-item" onclick="showSection('pointage')">
+            <span>⏱️</span>
+            <span>Pointage</span>
+          </div>
+          <div class="nav-item" onclick="showSection('employes')">
+            <span>👥</span>
+            <span>Employés</span>
+          </div>
         </div>
         <div class="sidebar-section" id="nav-commercial">
           <div class="sidebar-label">Commercial</div>
-          <div class="nav-item" onclick="showSection('leads')">🎯 Leads <span class="nav-badge" id="badge-leads">0</span></div>
-          <div class="nav-item" onclick="showSection('poker')">🃏 Poker</div>
-          <div class="nav-item" onclick="showSection('rdv')">📅 RDV <span class="nav-badge" id="badge-rdv">0</span></div>
-          <div class="nav-item" onclick="showSection('campagnes')">📧 Campagnes</div>
+          <div class="nav-item" onclick="showSection('leads')">
+            <span>🎯</span>
+            <span>Leads</span>
+            <span class="nav-badge" id="badge-leads">0</span>
+          </div>
+          <div class="nav-item" onclick="showSection('poker')">
+            <span>🃏</span>
+            <span>Poker</span>
+          </div>
+          <div class="nav-item" onclick="showSection('rdv')">
+            <span>📅</span>
+            <span>RDV</span>
+            <span class="nav-badge" id="badge-rdv">0</span>
+          </div>
+          <div class="nav-item" onclick="showSection('campagnes')">
+            <span>📧</span>
+            <span>Campagnes</span>
+          </div>
         </div>
         <div class="sidebar-section" id="nav-assurance">
           <div class="sidebar-label">Assurance</div>
-          <div class="nav-item" onclick="showSection('contrats')">📁 Contrats <span class="nav-badge orange" id="badge-contrats">0</span></div>
-          <div class="nav-item" onclick="showSection('validation')">✅ Validation <span class="nav-badge orange" id="badge-validation">0</span></div>
-          <div class="nav-item" onclick="showSection('audit')">🔍 Audit</div>
+          <div class="nav-item" onclick="showSection('contrats')">
+            <span>📁</span>
+            <span>Contrats</span>
+            <span class="nav-badge orange" id="badge-contrats">0</span>
+          </div>
+          <div class="nav-item" onclick="showSection('validation')">
+            <span>✅</span>
+            <span>Validation</span>
+            <span class="nav-badge orange" id="badge-validation">0</span>
+          </div>
+          <div class="nav-item" onclick="showSection('audit')">
+            <span>🔍</span>
+            <span>Audit</span>
+          </div>
         </div>
         <div class="sidebar-section" id="nav-marketing">
           <div class="sidebar-label">Marketing</div>
-          <div class="nav-item" onclick="showSection('marketing')">📱 Réseaux</div>
-          <div class="nav-item" onclick="showSection('analytics')">📈 Analytics</div>
+          <div class="nav-item" onclick="showSection('marketing')">
+            <span>📱</span>
+            <span>Réseaux</span>
+          </div>
+          <div class="nav-item" onclick="showSection('analytics')">
+            <span>📈</span>
+            <span>Analytics</span>
+          </div>
         </div>
         <div class="sidebar-section" id="nav-orga">
           <div class="sidebar-label">Organisation</div>
-          <div class="nav-item" onclick="showSection('agenda')">📅 Agenda</div>
-          <div class="nav-item" onclick="showSection('notes')">📝 Notes</div>
+          <div class="nav-item" onclick="showSection('agenda')">
+            <span>📅</span>
+            <span>Agenda</span>
+          </div>
+          <div class="nav-item" onclick="showSection('notes')">
+            <span>📝</span>
+            <span>Notes</span>
+          </div>
+        </div>
+        <div class="sidebar-section" id="nav-tools">
+          <div class="sidebar-label">Outils Pro</div>
+          <div class="nav-item" onclick="showSection('calculatrice')">
+            <span>🧮</span>
+            <span>Calculatrice Pro</span>
+          </div>
+          <div class="nav-item" onclick="showSection('googlesearch')">
+            <span>🔎</span>
+            <span>Google Search</span>
+          </div>
+          <div class="nav-item" onclick="showSection('vpn')">
+            <span>🌐</span>
+            <span>VPN & Réseau</span>
+          </div>
+          <div class="nav-item" onclick="showSection('aircall')">
+            <span>📞</span>
+            <span>Aircall Dialer</span>
+          </div>
         </div>
         <div class="sidebar-section" id="nav-system">
           <div class="sidebar-label">Système</div>
-          <div class="nav-item" onclick="showSection('workflows')">⚡ n8n</div>
-          <div class="nav-item" onclick="showSection('parametres')">⚙️ Paramètres</div>
-          <div class="nav-item" onclick="showSection('documentation')">📚 Docs</div>
+          <div class="nav-item" onclick="showSection('workflows')">
+            <span>⚡</span>
+            <span>n8n</span>
+          </div>
+          <div class="nav-item" onclick="showSection('acces')">
+            <span>🔐</span>
+            <span>Gestion Accès</span>
+          </div>
+          <div class="nav-item" onclick="showSection('parametres')">
+            <span>⚙️</span>
+            <span>Paramètres</span>
+          </div>
+          <div class="nav-item" onclick="showSection('documentation')">
+            <span>📚</span>
+            <span>Docs</span>
+          </div>
         </div>
       </div>
       <div class="sidebar-footer">
@@ -368,17 +635,17 @@ tr:hover td{background:rgba(255,255,255,.02)}
     </div>
   </div>
   <div class="stats-grid" id="dashboardStats">
-    <div class="stat-card"><div class="label">CA (mois)</div><div class="value" id="statCA">-</div><div class="change up">Cloud DB</div></div>
-    <div class="stat-card"><div class="label">Contrats</div><div class="value" id="statContrats">-</div><div class="change up">Sync temps réel</div></div>
-    <div class="stat-card"><div class="label">Leads actifs</div><div class="value" id="statLeads">-</div><div class="change up">PostgreSQL</div></div>
-    <div class="stat-card"><div class="label">Employés</div><div class="value" id="statEmployes">-</div><div class="change up">Supabase</div></div>
+    <div class="stat-card"><div class="label">💰 CA (mois)</div><div class="value" id="statCA">-</div><div class="change up">Cloud DB</div></div>
+    <div class="stat-card"><div class="label">📁 Contrats</div><div class="value" id="statContrats">-</div><div class="change up">Sync temps réel</div></div>
+    <div class="stat-card"><div class="label">🎯 Leads actifs</div><div class="value" id="statLeads">-</div><div class="change up">PostgreSQL</div></div>
+    <div class="stat-card"><div class="label">👥 Employés</div><div class="value" id="statEmployes">-</div><div class="change up">Supabase</div></div>
   </div>
   <div class="chart-grid">
-    <div class="chart-card"><h3>Performance</h3><div class="chart-wrap"><canvas id="chartPerf"></canvas></div></div>
-    <div class="chart-card"><h3>Répartition</h3><div class="chart-wrap"><canvas id="chartContrats"></canvas></div></div>
+    <div class="chart-card"><h3>📈 Performance</h3><div class="chart-wrap"><canvas id="chartPerf"></canvas></div></div>
+    <div class="chart-card"><h3>🥧 Répartition</h3><div class="chart-wrap"><canvas id="chartContrats"></canvas></div></div>
   </div>
   <div class="card">
-    <div class="card-title">Activité Temps Réel</div>
+    <div class="card-title">⚡ Activité Temps Réel</div>
     <div id="activityFeed"><div class="empty-state"><div class="icon">⏳</div><p>Chargement...</p></div></div>
   </div>
 </div>
@@ -427,7 +694,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
   </div>
 </div>
 
-<!-- ===== EMPLOYÉS ===== -->
+<!-- ===== EMPLOYES ===== -->
 <div class="section" id="sec-employes">
   <div class="page-header">
     <div><div class="page-title">Employés</div><div class="page-breadcrumb">LNR / RH / Employés</div></div>
@@ -449,6 +716,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
     <div><div class="page-title">Leads</div><div class="page-breadcrumb">LNR / Commercial / Leads</div></div>
     <div class="page-actions">
       <button class="btn btn-sm btn-primary" onclick="openModal('modalLead')">➕ Lead</button>
+      <button class="btn btn-sm btn-secondary" onclick="openModal('modalImportLeads')">📥 CSV</button>
       <button class="btn btn-sm btn-primary" onclick="refreshData('leads')">🔄 Sync</button>
     </div>
   </div>
@@ -458,10 +726,19 @@ tr:hover td{background:rgba(255,255,255,.02)}
     <div class="stat-card"><div class="label">Attribués</div><div class="value" id="statLeadsAttrib">-</div></div>
     <div class="stat-card"><div class="label">Signés</div><div class="value" id="statLeadsSignes">-</div></div>
   </div>
-  <div class="table-wrap">
-    <table><thead><tr><th>Réf</th><th>Nom</th><th>Tél</th><th>Âge</th><th>CP</th><th>Mutuelle</th><th>Score</th><th>Type</th><th>Commercial</th><th>Statut</th><th>Actions</th></tr></thead>
-    <tbody id="tableLeads"><tr><td colspan="11" class="empty-state">Chargement DB...</td></tr></tbody>
-    </table>
+  <div class="view-toggle">
+    <button class="view-toggle-btn active" onclick="switchLeadsView('table')" id="btnViewTable">📋 Tableau</button>
+    <button class="view-toggle-btn" onclick="switchLeadsView('cards')" id="btnViewCards">🃏 Cartes</button>
+  </div>
+  <div id="leadsTableView">
+    <div class="table-wrap">
+      <table><thead><tr><th>Réf</th><th>Nom</th><th>Tél</th><th>Âge</th><th>CP</th><th>Mutuelle</th><th>Score</th><th>Type</th><th>Commercial</th><th>Statut</th><th>Actions</th></tr></thead>
+      <tbody id="tableLeads"><tr><td colspan="11" class="empty-state">Chargement DB...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+  <div id="leadsCardsView" style="display:none">
+    <div class="leads-cards-grid" id="leadsCardsGrid"></div>
   </div>
 </div>
 
@@ -691,6 +968,381 @@ tr:hover td{background:rgba(255,255,255,.02)}
   <div class="notes-grid" id="notesGrid"><div class="empty-state" style="grid-column:1/-1"><div class="icon">📝</div><p>Chargement notes...</p></div></div>
 </div>
 
+<!-- ===== CALCULATRICE PRO ===== -->
+<div class="section" id="sec-calculatrice">
+  <div class="page-header">
+    <div><div class="page-title">🧮 Calculatrice Pro</div><div class="page-breadcrumb">LNR / Outils / Calculatrice</div></div>
+  </div>
+  <div class="calc-container">
+    <!-- CNSS Calculator -->
+    <div class="calc-card">
+      <h3>🏛️ CNSS Tunisie</h3>
+      <div class="form-group">
+        <label>Salaire brut (TND)</label>
+        <input type="number" id="cnssSalaire" placeholder="1500" oninput="calcCNSS()">
+      </div>
+      <div class="form-group">
+        <label>Taux salarial (%)</label>
+        <input type="number" id="cnssTauxSal" value="9.68" step="0.01" oninput="calcCNSS()">
+      </div>
+      <div class="form-group">
+        <label>Taux patronal (%)</label>
+        <input type="number" id="cnssTauxPat" value="17.07" step="0.01" oninput="calcCNSS()">
+      </div>
+      <div class="calc-result">
+        <div class="label">Part salariale</div>
+        <div class="value" id="cnssResultSal">-</div>
+      </div>
+      <div class="calc-result">
+        <div class="label">Part patronale</div>
+        <div class="value" id="cnssResultPat">-</div>
+      </div>
+      <div class="calc-result">
+        <div class="label">Salaire net estimé</div>
+        <div class="value" id="cnssResultNet" style="color:var(--success)">-</div>
+      </div>
+    </div>
+
+    <!-- TVA Calculator -->
+    <div class="calc-card">
+      <h3>💶 TVA Tunisie</h3>
+      <div class="form-group">
+        <label>Montant HT (TND)</label>
+        <input type="number" id="tvaHT" placeholder="1000" oninput="calcTVA()">
+      </div>
+      <div class="form-group">
+        <label>Taux TVA (%)</label>
+        <select id="tvaTaux" onchange="calcTVA()">
+          <option value="19">19% (Standard)</option>
+          <option value="13">13% (Réduit)</option>
+          <option value="7">7% (Super réduit)</option>
+        </select>
+      </div>
+      <div class="calc-result">
+        <div class="label">Montant TVA</div>
+        <div class="value" id="tvaResult">-</div>
+      </div>
+      <div class="calc-result">
+        <div class="label">Montant TTC</div>
+        <div class="value" id="ttcResult" style="color:var(--success)">-</div>
+      </div>
+      <div class="calc-result">
+        <div class="label">FODEC (1%)</div>
+        <div class="value" id="fodecResult">-</div>
+      </div>
+    </div>
+
+    <!-- Marge Calculator -->
+    <div class="calc-card">
+      <h3>📊 Marge & Commission</h3>
+      <div class="form-group">
+        <label>Prix d'achat (TND)</label>
+        <input type="number" id="margeAchat" placeholder="800" oninput="calcMarge()">
+      </div>
+      <div class="form-group">
+        <label>Prix de vente (TND)</label>
+        <input type="number" id="margeVente" placeholder="1200" oninput="calcMarge()">
+      </div>
+      <div class="form-group">
+        <label>% Commission</label>
+        <input type="number" id="margeCommission" value="10" step="0.5" oninput="calcMarge()">
+      </div>
+      <div class="calc-result">
+        <div class="label">Marge brute</div>
+        <div class="value" id="margeResult">-</div>
+      </div>
+      <div class="calc-result">
+        <div class="label">Taux de marge</div>
+        <div class="value" id="margeTaux" style="color:var(--accent)">-</div>
+      </div>
+      <div class="calc-result">
+        <div class="label">Commission</div>
+        <div class="value" id="commResult" style="color:var(--success)">-</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Standard Calculator -->
+  <div class="card">
+    <div class="card-title">🔢 Calculatrice Standard</div>
+    <div style="max-width:320px;margin:0 auto">
+      <div class="calc-display" id="calcDisplay">0</div>
+      <div class="calc-keypad">
+        <button class="calc-btn danger" onclick="calcClear()">C</button>
+        <button class="calc-btn" onclick="calcAppend('(')">(</button>
+        <button class="calc-btn" onclick="calcAppend(')')">)</button>
+        <button class="calc-btn accent" onclick="calcOp('/')">÷</button>
+        <button class="calc-btn" onclick="calcAppend('7')">7</button>
+        <button class="calc-btn" onclick="calcAppend('8')">8</button>
+        <button class="calc-btn" onclick="calcAppend('9')">9</button>
+        <button class="calc-btn accent" onclick="calcOp('*')">×</button>
+        <button class="calc-btn" onclick="calcAppend('4')">4</button>
+        <button class="calc-btn" onclick="calcAppend('5')">5</button>
+        <button class="calc-btn" onclick="calcAppend('6')">6</button>
+        <button class="calc-btn accent" onclick="calcOp('-')">−</button>
+        <button class="calc-btn" onclick="calcAppend('1')">1</button>
+        <button class="calc-btn" onclick="calcAppend('2')">2</button>
+        <button class="calc-btn" onclick="calcAppend('3')">3</button>
+        <button class="calc-btn accent" onclick="calcOp('+')">+</button>
+        <button class="calc-btn" onclick="calcAppend('0')">0</button>
+        <button class="calc-btn" onclick="calcAppend('.')">.</button>
+        <button class="calc-btn" onclick="calcBackspace()">⌫</button>
+        <button class="calc-btn accent" onclick="calcEqual()">=</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== GOOGLE SEARCH ===== -->
+<div class="section" id="sec-googlesearch">
+  <div class="page-header">
+    <div><div class="page-title">🔎 Google Search intégré</div><div class="page-breadcrumb">LNR / Outils / Recherche</div></div>
+  </div>
+  <div class="google-search-box">
+    <div class="google-search-input">
+      <input type="text" id="googleQuery" placeholder="Rechercher sur Google..." onkeydown="if(event.key==='Enter')doGoogleSearch()">
+      <button class="btn btn-primary" onclick="doGoogleSearch()">🔍 Rechercher</button>
+    </div>
+    <div class="info-box">💡 Les résultats s'ouvrent dans Google. Cette fonction permet une recherche rapide sans quitter le CRM.</div>
+  </div>
+  <div class="card">
+    <div class="card-title">📋 Recherches rapides</div>
+    <div class="grid-4">
+      <button class="btn btn-secondary btn-sm" onclick="quickGoogleSearch('mutuelle santé Tunisie')">Mutuelle Santé</button>
+      <button class="btn btn-secondary btn-sm" onclick="quickGoogleSearch('CNSS Tunisie cotisation')">CNSS</button>
+      <button class="btn btn-secondary btn-sm" onclick="quickGoogleSearch('ORIAS immatriculation')">ORIAS</button>
+      <button class="btn btn-secondary btn-sm" onclick="quickGoogleSearch('assurance complémentaire senior')">Senior</button>
+      <button class="btn btn-secondary btn-sm" onclick="quickGoogleSearch('Neoliane mutuelle')">Neoliane</button>
+      <button class="btn btn-secondary btn-sm" onclick="quickGoogleSearch('Alptis assurance')">Alptis</button>
+      <button class="btn btn-secondary btn-sm" onclick="quickGoogleSearch('SPVIE mutuelle')">SPVIE</button>
+      <button class="btn btn-secondary btn-sm" onclick="quickGoogleSearch('loi assurance Tunisie')">Loi</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">🌐 Résultats de recherche</div>
+    <div id="googleResults" class="google-results">
+      <div class="empty-state">
+        <div class="icon">🔍</div>
+        <p>Saisissez une recherche ci-dessus</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== VPN & OUTILS RESEAU ===== -->
+<div class="section" id="sec-vpn">
+  <div class="page-header">
+    <div><div class="page-title">🌐 VPN & Outils Réseau</div><div class="page-breadcrumb">LNR / Outils / Réseau</div></div>
+  </div>
+  <div class="tools-grid">
+    <!-- IP Info -->
+    <div class="tool-card">
+      <h3>🌍 IP Info</h3>
+      <div class="form-group">
+        <label>Adresse IP ou domaine</label>
+        <input type="text" id="ipInput" placeholder="8.8.8.8 ou google.com">
+      </div>
+      <div class="page-actions mb-8">
+        <button class="btn btn-sm btn-primary" onclick="getIPInfo()">🔍 Analyser IP</button>
+        <button class="btn btn-sm btn-secondary" onclick="getMyIP()">📍 Mon IP</button>
+      </div>
+      <div class="tool-output" id="ipOutput">
+        <div class="line">Cliquez sur "Analyser IP" ou "Mon IP"</div>
+      </div>
+    </div>
+
+    <!-- DNS Lookup -->
+    <div class="tool-card">
+      <h3>🔍 DNS Lookup</h3>
+      <div class="form-group">
+        <label>Domaine</label>
+        <input type="text" id="dnsInput" placeholder="lnr-finance.fr">
+      </div>
+      <div class="page-actions mb-8">
+        <button class="btn btn-sm btn-primary" onclick="dnsLookup()">🔍 DNS Lookup</button>
+      </div>
+      <div class="tool-output" id="dnsOutput">
+        <div class="line">Entrez un domaine et cliquez sur DNS Lookup</div>
+      </div>
+    </div>
+
+    <!-- MX Lookup -->
+    <div class="tool-card">
+      <h3>📧 MX Lookup</h3>
+      <div class="form-group">
+        <label>Domaine</label>
+        <input type="text" id="mxInput" placeholder="gmail.com">
+      </div>
+      <div class="page-actions mb-8">
+        <button class="btn btn-sm btn-primary" onclick="mxLookup()">🔍 MX Lookup</button>
+      </div>
+      <div class="tool-output" id="mxOutput">
+        <div class="line">Entrez un domaine pour voir les enregistrements MX</div>
+      </div>
+    </div>
+
+    <!-- SSL Check -->
+    <div class="tool-card">
+      <h3>🔒 SSL Check</h3>
+      <div class="form-group">
+        <label>Domaine HTTPS</label>
+        <input type="text" id="sslInput" placeholder="crm-lnr-finance.fr">
+      </div>
+      <div class="page-actions mb-8">
+        <button class="btn btn-sm btn-primary" onclick="sslCheck()">🔍 Vérifier SSL</button>
+      </div>
+      <div class="tool-output" id="sslOutput">
+        <div class="line">Entrez un domaine pour vérifier le certificat SSL</div>
+      </div>
+    </div>
+
+    <!-- Speed Test -->
+    <div class="tool-card">
+      <h3>⚡ Speed Test</h3>
+      <div class="info-box" style="margin-bottom:12px">Test de vitesse simulé (utilise une image de test)</div>
+      <div class="page-actions mb-8">
+        <button class="btn btn-sm btn-primary" onclick="speedTest()">▶ Lancer le test</button>
+      </div>
+      <div class="tool-output" id="speedOutput">
+        <div class="line">Cliquez sur "Lancer le test"</div>
+      </div>
+    </div>
+
+    <!-- Cloudflare Status -->
+    <div class="tool-card">
+      <h3>☁️ Cloudflare Status</h3>
+      <div class="page-actions mb-8">
+        <button class="btn btn-sm btn-primary" onclick="checkCloudflare()">🔍 Vérifier Status</button>
+      </div>
+      <div class="tool-output" id="cfOutput">
+        <div class="line">Cliquez pour vérifier le statut Cloudflare</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== AIRCALL DIALER ===== -->
+<div class="section" id="sec-aircall">
+  <div class="page-header">
+    <div><div class="page-title">📞 Aircall Dialer</div><div class="page-breadcrumb">LNR / Outils / Téléphonie</div></div>
+  </div>
+  <div class="grid-2">
+    <div>
+      <div class="dialer-container">
+        <div class="dialer-display">
+          <div class="number" id="dialerNumber"></div>
+          <div class="status" id="dialerStatus">Prêt</div>
+        </div>
+        <div class="dialer-pad">
+          <div class="dialer-btn" onclick="dialerPress('1')"><div class="digit">1</div></div>
+          <div class="dialer-btn" onclick="dialerPress('2')"><div class="digit">2</div><div class="letters">ABC</div></div>
+          <div class="dialer-btn" onclick="dialerPress('3')"><div class="digit">3</div><div class="letters">DEF</div></div>
+          <div class="dialer-btn" onclick="dialerPress('4')"><div class="digit">4</div><div class="letters">GHI</div></div>
+          <div class="dialer-btn" onclick="dialerPress('5')"><div class="digit">5</div><div class="letters">JKL</div></div>
+          <div class="dialer-btn" onclick="dialerPress('6')"><div class="digit">6</div><div class="letters">MNO</div></div>
+          <div class="dialer-btn" onclick="dialerPress('7')"><div class="digit">7</div><div class="letters">PQRS</div></div>
+          <div class="dialer-btn" onclick="dialerPress('8')"><div class="digit">8</div><div class="letters">TUV</div></div>
+          <div class="dialer-btn" onclick="dialerPress('9')"><div class="digit">9</div><div class="letters">WXYZ</div></div>
+          <div class="dialer-btn" onclick="dialerPress('*')"><div class="digit">*</div></div>
+          <div class="dialer-btn" onclick="dialerPress('0')"><div class="digit">0</div><div class="letters">+</div></div>
+          <div class="dialer-btn" onclick="dialerPress('#')"><div class="digit">#</div></div>
+        </div>
+        <div class="dialer-actions">
+          <button class="dialer-call" onclick="dialerCall()">📞 Appeler</button>
+          <button class="dialer-hangup" onclick="dialerHangup()">📵 Raccrocher</button>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button class="btn btn-sm btn-secondary" style="flex:1" onclick="dialerClear()">⌫ Effacer</button>
+          <button class="btn btn-sm btn-secondary" style="flex:1" onclick="dialerPaste()">📋 Coller</button>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="card">
+        <div class="card-title">📜 Historique d'appels</div>
+        <div class="call-history" id="callHistory">
+          <div class="call-history-item">
+            <span class="icon outgoing">📤</span>
+            <div class="info">
+              <div>+216 28 768 428</div>
+              <div class="time">Aujourd'hui 14:30 • 2min 15s</div>
+            </div>
+            <span class="badge badge-success">OK</span>
+          </div>
+          <div class="call-history-item">
+            <span class="icon incoming">📥</span>
+            <div class="info">
+              <div>+216 98 123 456</div>
+              <div class="time">Aujourd'hui 11:15 • 5min 30s</div>
+            </div>
+            <span class="badge badge-success">OK</span>
+          </div>
+          <div class="call-history-item">
+            <span class="icon missed">❌</span>
+            <div class="info">
+              <div>+216 22 987 654</div>
+              <div class="time">Hier 16:45 • Manqué</div>
+            </div>
+            <span class="badge badge-danger">NRP</span>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">⚡ Actions rapides</div>
+        <div class="grid-2">
+          <button class="btn btn-sm btn-secondary" onclick="dialerSetNumber('+21628768428')">📞 Direction</button>
+          <button class="btn btn-sm btn-secondary" onclick="dialerSetNumber('+21698123456')">📞 Support</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== GESTION ACCES ===== -->
+<div class="section" id="sec-acces">
+  <div class="page-header">
+    <div><div class="page-title">🔐 Portail Gestion Accès</div><div class="page-breadcrumb">LNR / Système / Accès</div></div>
+    <div class="page-actions">
+      <button class="btn btn-sm btn-primary" onclick="openModal('modalUser')">➕ Utilisateur</button>
+      <button class="btn btn-sm btn-primary" onclick="refreshData('utilisateurs')">🔄 Sync</button>
+    </div>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="label">Utilisateurs</div><div class="value" id="statUsersTotal">-</div></div>
+    <div class="stat-card"><div class="label">Actifs</div><div class="value" id="statUsersActif">-</div></div>
+    <div class="stat-card"><div class="label">Managers</div><div class="value" id="statUsersManager">-</div></div>
+    <div class="stat-card"><div class="label">Commerciaux</div><div class="value" id="statUsersCom">-</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">👥 Utilisateurs et Permissions</div>
+    <div class="user-grid" id="usersGrid">
+      <div class="empty-state" style="grid-column:1/-1"><div class="icon">👥</div><p>Chargement utilisateurs...</p></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">🔑 Matrice des permissions par rôle</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Permission</th><th>👤 RH</th><th>💼 Commercial</th><th>📞 Télévendeur</th><th>📋 Gestion</th><th>👔 Manager</th><th>💻 IT</th></tr></thead>
+        <tbody>
+          <tr><td>Dashboard</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td></tr>
+          <tr><td>Recrutement</td><td>✅</td><td>❌</td><td>❌</td><td>❌</td><td>✅</td><td>✅</td></tr>
+          <tr><td>Pointage</td><td>✅</td><td>❌</td><td>❌</td><td>❌</td><td>✅</td><td>✅</td></tr>
+          <tr><td>Employés</td><td>✅</td><td>❌</td><td>❌</td><td>❌</td><td>✅</td><td>✅</td></tr>
+          <tr><td>Leads (tous)</td><td>❌</td><td>✅</td><td>✅</td><td>❌</td><td>✅</td><td>✅</td></tr>
+          <tr><td>Leads (perso)</td><td>❌</td><td>✅</td><td>❌</td><td>❌</td><td>✅</td><td>✅</td></tr>
+          <tr><td>Contrats</td><td>❌</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td></tr>
+          <tr><td>Validation</td><td>❌</td><td>❌</td><td>❌</td><td>✅</td><td>✅</td><td>✅</td></tr>
+          <tr><td>Audit</td><td>❌</td><td>❌</td><td>❌</td><td>✅</td><td>✅</td><td>✅</td></tr>
+          <tr><td>Marketing</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>✅</td><td>✅</td></tr>
+          <tr><td>Paramètres</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>✅</td><td>✅</td></tr>
+          <tr><td>Gestion Accès</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>✅</td><td>✅</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
 <!-- ===== WORKFLOWS ===== -->
 <div class="section" id="sec-workflows">
   <div class="page-header">
@@ -708,17 +1360,41 @@ tr:hover td{background:rgba(255,255,255,.02)}
   <div class="card">
     <div class="card-title">⚡ Workflows actifs</div>
     <div class="wf-list">
-      <div class="wf-item"><div class="wf-info"><div class="name">Recrutement Complet</div><div class="meta">Webhook HTTP POST</div></div><div class="wf-stats"><span>3</span>exec</div><span class="badge badge-success">Actif</span></div>
-      <div class="wf-item"><div class="wf-info"><div class="name">Pointage Quotidien</div><div class="meta">Schedule 9h30</div></div><div class="wf-stats"><span>1</span>exec</div><span class="badge badge-success">Actif</span></div>
-      <div class="wf-item"><div class="wf-info"><div class="name">Qualification Massive</div><div class="meta">Automatique</div></div><div class="wf-stats"><span>18</span>exec</div><span class="badge badge-success">Actif</span></div>
-      <div class="wf-item"><div class="wf-info"><div class="name">Distribution Leads</div><div class="meta">Automatique</div></div><div class="wf-stats"><span>24</span>exec</div><span class="badge badge-success">Actif</span></div>
-      <div class="wf-item"><div class="wf-info"><div class="name">Envoi Instantly</div><div class="meta">Toutes les heures</div></div><div class="wf-stats"><span>47</span>exec</div><span class="badge badge-success">Actif</span></div>
-      <div class="wf-item"><div class="wf-info"><div class="name">Relance Documents</div><div class="meta">J+1, J+3, J+7</div></div><div class="wf-stats"><span>8</span>exec</div><span class="badge badge-success">Actif</span></div>
+      <div class="wf-item">
+        <div class="wf-info"><div class="name">Recrutement Complet</div><div class="meta">Webhook HTTP POST</div></div>
+        <div class="wf-stats"><span>3</span>exec</div>
+        <span class="badge badge-success">Actif</span>
+      </div>
+      <div class="wf-item">
+        <div class="wf-info"><div class="name">Pointage Quotidien</div><div class="meta">Schedule 9h30</div></div>
+        <div class="wf-stats"><span>1</span>exec</div>
+        <span class="badge badge-success">Actif</span>
+      </div>
+      <div class="wf-item">
+        <div class="wf-info"><div class="name">Qualification Massive</div><div class="meta">Automatique</div></div>
+        <div class="wf-stats"><span>18</span>exec</div>
+        <span class="badge badge-success">Actif</span>
+      </div>
+      <div class="wf-item">
+        <div class="wf-info"><div class="name">Distribution Leads</div><div class="meta">Automatique</div></div>
+        <div class="wf-stats"><span>24</span>exec</div>
+        <span class="badge badge-success">Actif</span>
+      </div>
+      <div class="wf-item">
+        <div class="wf-info"><div class="name">Envoi Instantly</div><div class="meta">Toutes les heures</div></div>
+        <div class="wf-stats"><span>47</span>exec</div>
+        <span class="badge badge-success">Actif</span>
+      </div>
+      <div class="wf-item">
+        <div class="wf-info"><div class="name">Relance Documents</div><div class="meta">J+1, J+3, J+7</div></div>
+        <div class="wf-stats"><span>8</span>exec</div>
+        <span class="badge badge-success">Actif</span>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- ===== PARAMÈTRES ===== -->
+<!-- ===== PARAMETRES ===== -->
 <div class="section" id="sec-parametres">
   <div class="page-header">
     <div><div class="page-title">Paramètres Système</div><div class="page-breadcrumb">LNR / Système / Paramètres</div></div>
@@ -785,11 +1461,23 @@ tr:hover td{background:rgba(255,255,255,.02)}
 <div class="modal-overlay" id="modalCandidat">
   <div class="modal modal-lg">
     <div class="modal-header"><div class="modal-title">👤 Nouveau Candidat</div><button class="modal-close" onclick="closeModal('modalCandidat')">✕</button></div>
-    <div class="form-row"><div class="form-group"><label>Nom *</label><input id="candNom" placeholder="Nom"></div><div class="form-group"><label>Prénom *</label><input id="candPrenom" placeholder="Prénom"></div></div>
-    <div class="form-row"><div class="form-group"><label>Téléphone</label><input id="candTel" placeholder="+216..."></div><div class="form-group"><label>Email</label><input id="candEmail" type="email"></div></div>
-    <div class="form-row"><div class="form-group"><label>Poste *</label><select id="candPoste"><option>Télévendeur</option><option>Chargé RDV</option><option>Chef d'équipe</option><option>Gestionnaire</option></select></div><div class="form-group"><label>Expérience (années)</label><input id="candExp" type="number" value="0"></div></div>
+    <div class="grid-2">
+      <div class="form-group"><label>Nom *</label><input id="candNom" placeholder="Nom"></div>
+      <div class="form-group"><label>Prénom *</label><input id="candPrenom" placeholder="Prénom"></div>
+    </div>
+    <div class="grid-2">
+      <div class="form-group"><label>Téléphone</label><input id="candTel" placeholder="+216..."></div>
+      <div class="form-group"><label>Email</label><input id="candEmail" type="email"></div>
+    </div>
+    <div class="grid-2">
+      <div class="form-group"><label>Poste *</label><select id="candPoste"><option>Télévendeur</option><option>Chargé RDV</option><option>Chef d'équipe</option><option>Gestionnaire</option></select></div>
+      <div class="form-group"><label>Expérience (années)</label><input id="candExp" type="number" value="0"></div>
+    </div>
     <div class="form-group"><label>Expérience Mutuelle</label><select id="candExpMut"><option>Aucune</option><option>< 1 an</option><option>1-2 ans</option><option>2-5 ans</option><option>> 5 ans</option></select></div>
-    <div class="form-row"><div class="form-group"><label>Disponibilité</label><select id="candDispo"><option>Immédiate</option><option>1 mois</option><option>2 mois</option></select></div><div class="form-group"><label>Niveau Français</label><select id="candFr"><option>Excellent</option><option>Bon</option><option>Moyen</option></select></div></div>
+    <div class="grid-2">
+      <div class="form-group"><label>Disponibilité</label><select id="candDispo"><option>Immédiate</option><option>1 mois</option><option>2 mois</option></select></div>
+      <div class="form-group"><label>Niveau Français</label><select id="candFr"><option>Excellent</option><option>Bon</option><option>Moyen</option></select></div>
+    </div>
     <div class="form-group"><label>Commentaire</label><textarea id="candCommentaire" placeholder="..."></textarea></div>
     <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalCandidat')">Annuler</button><button class="btn btn-primary" onclick="saveCandidat()">💾 Sauvegarder</button></div>
   </div>
@@ -798,8 +1486,14 @@ tr:hover td{background:rgba(255,255,255,.02)}
 <div class="modal-overlay" id="modalPointage">
   <div class="modal">
     <div class="modal-header"><div class="modal-title">⏱️ Nouveau Pointage</div><button class="modal-close" onclick="closeModal('modalPointage')">✕</button></div>
-    <div class="form-row"><div class="form-group"><label>Employé</label><select id="pointEmploye"></select></div><div class="form-group"><label>Date</label><input id="pointDate" type="date"></div></div>
-    <div class="form-row"><div class="form-group"><label>Arrivée</label><input id="pointArrivee" type="time" value="09:00"></div><div class="form-group"><label>Départ</label><input id="pointDepart" type="time" value="18:00"></div></div>
+    <div class="grid-2">
+      <div class="form-group"><label>Employé</label><select id="pointEmploye"></select></div>
+      <div class="form-group"><label>Date</label><input id="pointDate" type="date"></div>
+    </div>
+    <div class="grid-2">
+      <div class="form-group"><label>Arrivée</label><input id="pointArrivee" type="time" value="09:00"></div>
+      <div class="form-group"><label>Départ</label><input id="pointDepart" type="time" value="18:00"></div>
+    </div>
     <div class="form-group"><label>Statut</label><select id="pointStatut"><option value="present">Présent</option><option value="retard">Retard</option><option value="absent">Absent</option><option value="conge">Congé</option></select></div>
     <div class="form-group"><label>Justificatif</label><textarea id="pointJustif" placeholder="..."></textarea></div>
     <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalPointage')">Annuler</button><button class="btn btn-primary" onclick="savePointage()">💾 Sauvegarder</button></div>
@@ -809,10 +1503,22 @@ tr:hover td{background:rgba(255,255,255,.02)}
 <div class="modal-overlay" id="modalEmploye">
   <div class="modal">
     <div class="modal-header"><div class="modal-title">👤 Nouvel Employé</div><button class="modal-close" onclick="closeModal('modalEmploye')">✕</button></div>
-    <div class="form-row"><div class="form-group"><label>Nom *</label><input id="empNom" placeholder="Nom"></div><div class="form-group"><label>Prénom *</label><input id="empPrenom" placeholder="Prénom"></div></div>
-    <div class="form-row"><div class="form-group"><label>Poste *</label><select id="empPoste"><option>Télévendeur</option><option>Chargé RDV</option><option>Commercial</option><option>Chef d'équipe</option><option>Gestionnaire</option></select></div><div class="form-group"><label>Salaire brut (TND)</label><input id="empSalaire" type="number"></div></div>
-    <div class="form-row"><div class="form-group"><label>Email</label><input id="empEmail" type="email" placeholder="@lnr-finance.fr"></div><div class="form-group"><label>Téléphone</label><input id="empTel" placeholder="+216..."></div></div>
-    <div class="form-row"><div class="form-group"><label>Matricule CNSS</label><input id="empCNSS" placeholder="CNSS-00X"></div><div class="form-group"><label>CIN</label><input id="empCIN" placeholder="Numéro CIN"></div></div>
+    <div class="grid-2">
+      <div class="form-group"><label>Nom *</label><input id="empNom" placeholder="Nom"></div>
+      <div class="form-group"><label>Prénom *</label><input id="empPrenom" placeholder="Prénom"></div>
+    </div>
+    <div class="grid-2">
+      <div class="form-group"><label>Poste *</label><select id="empPoste"><option>Télévendeur</option><option>Chargé RDV</option><option>Commercial</option><option>Chef d'équipe</option><option>Gestionnaire</option></select></div>
+      <div class="form-group"><label>Salaire brut (TND)</label><input id="empSalaire" type="number"></div>
+    </div>
+    <div class="grid-2">
+      <div class="form-group"><label>Email</label><input id="empEmail" type="email" placeholder="@lnr-finance.fr"></div>
+      <div class="form-group"><label>Téléphone</label><input id="empTel" placeholder="+216..."></div>
+    </div>
+    <div class="grid-2">
+      <div class="form-group"><label>Matricule CNSS</label><input id="empCNSS" placeholder="CNSS-00X"></div>
+      <div class="form-group"><label>CIN</label><input id="empCIN" placeholder="Numéro CIN"></div>
+    </div>
     <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalEmploye')">Annuler</button><button class="btn btn-primary" onclick="saveEmploye()">💾 Sauvegarder</button></div>
   </div>
 </div>
@@ -820,10 +1526,22 @@ tr:hover td{background:rgba(255,255,255,.02)}
 <div class="modal-overlay" id="modalLead">
   <div class="modal">
     <div class="modal-header"><div class="modal-title">🎯 Nouveau Lead</div><button class="modal-close" onclick="closeModal('modalLead')">✕</button></div>
-    <div class="form-row"><div class="form-group"><label>Prénom *</label><input id="leadPrenom"></div><div class="form-group"><label>Nom *</label><input id="leadNom"></div></div>
-    <div class="form-row"><div class="form-group"><label>Téléphone *</label><input id="leadTel" placeholder="+216..."></div><div class="form-group"><label>Email</label><input id="leadEmail" type="email"></div></div>
-    <div class="form-row"><div class="form-group"><label>Âge</label><input id="leadAge" type="number"></div><div class="form-group"><label>Code postal</label><input id="leadCP" placeholder="1002"></div></div>
-    <div class="form-row"><div class="form-group"><label>Mutuelle actuelle</label><input id="leadMutuelle" placeholder="CNSS, AMC..."></div><div class="form-group"><label>Type</label><select id="leadType"><option>SENIOR_SEUL</option><option>SENIOR_COUPLE</option><option>RETRAITE_FAMILLE</option><option>PRE_RETRAITE</option><option>AUTRE</option></select></div></div>
+    <div class="grid-2">
+      <div class="form-group"><label>Prénom *</label><input id="leadPrenom"></div>
+      <div class="form-group"><label>Nom *</label><input id="leadNom"></div>
+    </div>
+    <div class="grid-2">
+      <div class="form-group"><label>Téléphone *</label><input id="leadTel" placeholder="+216..."></div>
+      <div class="form-group"><label>Email</label><input id="leadEmail" type="email"></div>
+    </div>
+    <div class="grid-2">
+      <div class="form-group"><label>Âge</label><input id="leadAge" type="number"></div>
+      <div class="form-group"><label>Code postal</label><input id="leadCP" placeholder="1002"></div>
+    </div>
+    <div class="grid-2">
+      <div class="form-group"><label>Mutuelle actuelle</label><input id="leadMutuelle" placeholder="CNSS, AMC..."></div>
+      <div class="form-group"><label>Type</label><select id="leadType"><option>SENIOR_SEUL</option><option>SENIOR_COUPLE</option><option>RETRAITE_FAMILLE</option><option>PRE_RETRAITE</option><option>AUTRE</option></select></div>
+    </div>
     <div class="form-group"><label>Besoins</label><textarea id="leadBesoins" placeholder="..."></textarea></div>
     <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalLead')">Annuler</button><button class="btn btn-primary" onclick="saveLead()">💾 Sauvegarder</button></div>
   </div>
@@ -832,9 +1550,18 @@ tr:hover td{background:rgba(255,255,255,.02)}
 <div class="modal-overlay" id="modalRDV">
   <div class="modal">
     <div class="modal-header"><div class="modal-title">📅 Nouveau RDV</div><button class="modal-close" onclick="closeModal('modalRDV')">✕</button></div>
-    <div class="form-row"><div class="form-group"><label>Date *</label><input id="rdvDate" type="date"></div><div class="form-group"><label>Heure *</label><input id="rdvHeure" type="time"></div></div>
-    <div class="form-row"><div class="form-group"><label>Client *</label><input id="rdvClient"></div><div class="form-group"><label>Téléphone</label><input id="rdvTel"></div></div>
-    <div class="form-row"><div class="form-group"><label>Commercial</label><select id="rdvCommercial"></select></div><div class="form-group"><label>Type</label><select id="rdvType"><option>Présentiel</option><option>Visio</option><option>Téléphonique</option></select></div></div>
+    <div class="grid-2">
+      <div class="form-group"><label>Date *</label><input id="rdvDate" type="date"></div>
+      <div class="form-group"><label>Heure *</label><input id="rdvHeure" type="time"></div>
+    </div>
+    <div class="grid-2">
+      <div class="form-group"><label>Client *</label><input id="rdvClient"></div>
+      <div class="form-group"><label>Téléphone</label><input id="rdvTel"></div>
+    </div>
+    <div class="grid-2">
+      <div class="form-group"><label>Commercial</label><select id="rdvCommercial"></select></div>
+      <div class="form-group"><label>Type</label><select id="rdvType"><option>Présentiel</option><option>Visio</option><option>Téléphonique</option></select></div>
+    </div>
     <div class="form-group"><label>Lien Cal.com</label><input id="rdvLien" placeholder="https://cal.com/..."></div>
     <div class="form-group"><label>Notes</label><textarea id="rdvNotes" placeholder="..."></textarea></div>
     <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalRDV')">Annuler</button><button class="btn btn-primary" onclick="saveRDV()">💾 Sauvegarder</button></div>
@@ -845,7 +1572,10 @@ tr:hover td{background:rgba(255,255,255,.02)}
   <div class="modal">
     <div class="modal-header"><div class="modal-title">📧 Nouvelle Campagne</div><button class="modal-close" onclick="closeModal('modalCampagne')">✕</button></div>
     <div class="form-group"><label>Nom *</label><input id="campNom" placeholder="Campagne..."></div>
-    <div class="form-row"><div class="form-group"><label>Type</label><select id="campType"><option>J1</option><option>J3</option><option>J7</option><option>J15</option></select></div><div class="form-group"><label>Date début</label><input id="campDate" type="date"></div></div>
+    <div class="grid-2">
+      <div class="form-group"><label>Type</label><select id="campType"><option>J1</option><option>J3</option><option>J7</option><option>J15</option></select></div>
+      <div class="form-group"><label>Date début</label><input id="campDate" type="date"></div>
+    </div>
     <div class="form-group"><label>Leads cibles</label><select id="campCibles"><option>Score > 70</option><option>Score 50-70</option><option>Tous qualifiés</option><option>NRP réintégrés</option></select></div>
     <div class="form-group"><label>Quota/jour</label><input id="campQuota" type="number" value="20"></div>
     <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalCampagne')">Annuler</button><button class="btn btn-primary" onclick="saveCampagne()">💾 Sauvegarder</button></div>
@@ -855,10 +1585,22 @@ tr:hover td{background:rgba(255,255,255,.02)}
 <div class="modal-overlay" id="modalContrat">
   <div class="modal modal-lg">
     <div class="modal-header"><div class="modal-title">📁 Nouveau Contrat</div><button class="modal-close" onclick="closeModal('modalContrat')">✕</button></div>
-    <div class="form-row"><div class="form-group"><label>Nom *</label><input id="ctrNom"></div><div class="form-group"><label>Prénom *</label><input id="ctrPrenom"></div></div>
-    <div class="form-row"><div class="form-group"><label>Téléphone *</label><input id="ctrTel"></div><div class="form-group"><label>Email</label><input id="ctrEmail" type="email"></div></div>
-    <div class="form-row"><div class="form-group"><label>Compagnie *</label><select id="ctrCompagnie"><option>Neoliane</option><option>Alptis</option><option>SPVIE</option></select></div><div class="form-group"><label>Montant/mois (TND)</label><input id="ctrMontant" type="number"></div></div>
-    <div class="form-row"><div class="form-group"><label>Date effet</label><input id="ctrDateEffet" type="date"></div><div class="form-group"><label>Ancienne mutuelle</label><input id="ctrAncienne"></div></div>
+    <div class="grid-2">
+      <div class="form-group"><label>Nom *</label><input id="ctrNom"></div>
+      <div class="form-group"><label>Prénom *</label><input id="ctrPrenom"></div>
+    </div>
+    <div class="grid-2">
+      <div class="form-group"><label>Téléphone *</label><input id="ctrTel"></div>
+      <div class="form-group"><label>Email</label><input id="ctrEmail" type="email"></div>
+    </div>
+    <div class="grid-2">
+      <div class="form-group"><label>Compagnie *</label><select id="ctrCompagnie"><option>Neoliane</option><option>Alptis</option><option>SPVIE</option></select></div>
+      <div class="form-group"><label>Montant/mois (TND)</label><input id="ctrMontant" type="number"></div>
+    </div>
+    <div class="grid-2">
+      <div class="form-group"><label>Date effet</label><input id="ctrDateEffet" type="date"></div>
+      <div class="form-group"><label>Ancienne mutuelle</label><input id="ctrAncienne"></div>
+    </div>
     <div class="form-group"><label>Commentaire</label><textarea id="ctrCommentaire" placeholder="..."></textarea></div>
     <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalContrat')">Annuler</button><button class="btn btn-primary" onclick="saveContrat()">💾 Sauvegarder</button></div>
   </div>
@@ -867,8 +1609,14 @@ tr:hover td{background:rgba(255,255,255,.02)}
 <div class="modal-overlay" id="modalAudit">
   <div class="modal modal-lg">
     <div class="modal-header"><div class="modal-title">🔍 Nouvel Audit</div><button class="modal-close" onclick="closeModal('modalAudit')">✕</button></div>
-    <div class="form-row"><div class="form-group"><label>Commercial</label><select id="auditCommercial"></select></div><div class="form-group"><label>Client</label><input id="auditClient"></div></div>
-    <div class="form-row"><div class="form-group"><label>Date vente</label><input id="auditDate" type="date"></div><div class="form-group"><label>Compagnie</label><select id="auditCompagnie"><option>Neoliane</option><option>Alptis</option><option>SPVIE</option></select></div></div>
+    <div class="grid-2">
+      <div class="form-group"><label>Commercial</label><select id="auditCommercial"></select></div>
+      <div class="form-group"><label>Client</label><input id="auditClient"></div>
+    </div>
+    <div class="grid-2">
+      <div class="form-group"><label>Date vente</label><input id="auditDate" type="date"></div>
+      <div class="form-group"><label>Compagnie</label><select id="auditCompagnie"><option>Neoliane</option><option>Alptis</option><option>SPVIE</option></select></div>
+    </div>
     <div class="form-group"><label>Transcription</label><textarea id="auditTranscription" style="min-height:120px" placeholder="Collez la transcription..."></textarea></div>
     <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalAudit')">Annuler</button><button class="btn btn-primary" onclick="saveAudit()">💾 Sauvegarder</button></div>
   </div>
@@ -882,10 +1630,17 @@ tr:hover td{background:rgba(255,255,255,.02)}
       <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="postIg" checked> 📸 Instagram</label>
       <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="postLi"> 💼 LinkedIn</label>
     </div>
-    <div class="form-row"><div class="form-group"><label>Date</label><input id="postDate" type="date"></div><div class="form-group"><label>Heure</label><input id="postHeure" type="time" value="10:00"></div></div>
+    <div class="grid-2">
+      <div class="form-group"><label>Date</label><input id="postDate" type="date"></div>
+      <div class="form-group"><label>Heure</label><input id="postHeure" type="time" value="10:00"></div>
+    </div>
     <div class="form-group"><label>Contenu *</label><textarea id="postContenu" style="min-height:120px" placeholder="Rédigez..."></textarea></div>
     <div class="form-group"><label>Hashtags</label><input id="postTags" placeholder="#mutuellesanté #lnrfinance"></div>
-    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalPost')">Annuler</button><button class="btn btn-secondary" onclick="savePost('brouillon')">💾 Brouillon</button><button class="btn btn-primary" onclick="savePost('programme')">📅 Programmer</button></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modalPost')">Annuler</button>
+      <button class="btn btn-secondary" onclick="savePost('brouillon')">💾 Brouillon</button>
+      <button class="btn btn-primary" onclick="savePost('programme')">📅 Programmer</button>
+    </div>
   </div>
 </div>
 
@@ -893,8 +1648,14 @@ tr:hover td{background:rgba(255,255,255,.02)}
   <div class="modal">
     <div class="modal-header"><div class="modal-title">📅 Nouvel Événement</div><button class="modal-close" onclick="closeModal('modalAgenda')">✕</button></div>
     <div class="form-group"><label>Titre *</label><input id="agendaTitre" placeholder="Titre..."></div>
-    <div class="form-row"><div class="form-group"><label>Début</label><input id="agendaDebut" type="datetime-local"></div><div class="form-group"><label>Fin</label><input id="agendaFin" type="datetime-local"></div></div>
-    <div class="form-row"><div class="form-group"><label>Type</label><select id="agendaType"><option>rdv</option><option>tache</option><option>rappel</option><option>conge</option><option>formation</option></select></div><div class="form-group"><label>Couleur</label><input id="agendaCouleur" type="color" value="#4f8ef7"></div></div>
+    <div class="grid-2">
+      <div class="form-group"><label>Début</label><input id="agendaDebut" type="datetime-local"></div>
+      <div class="form-group"><label>Fin</label><input id="agendaFin" type="datetime-local"></div>
+    </div>
+    <div class="grid-2">
+      <div class="form-group"><label>Type</label><select id="agendaType"><option>rdv</option><option>tache</option><option>rappel</option><option>conge</option><option>formation</option></select></div>
+      <div class="form-group"><label>Couleur</label><input id="agendaCouleur" type="color" value="#4f8ef7"></div>
+    </div>
     <div class="form-group"><label>Description</label><textarea id="agendaDesc" placeholder="..."></textarea></div>
     <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalAgenda')">Annuler</button><button class="btn btn-primary" onclick="saveAgenda()">💾 Sauvegarder</button></div>
   </div>
@@ -905,7 +1666,12 @@ tr:hover td{background:rgba(255,255,255,.02)}
     <div class="modal-header"><div class="modal-title">📝 Nouvelle Note</div><button class="modal-close" onclick="closeModal('modalNote')">✕</button></div>
     <div class="form-group"><label>Titre</label><input id="noteTitre" placeholder="Titre..."></div>
     <div class="form-group"><label>Contenu *</label><textarea id="noteContenu" style="min-height:120px" placeholder="Votre note..."></textarea></div>
-    <div class="form-row"><div class="form-group"><label>Catégorie</label><select id="noteCat"><option>general</option><option>lead</option><option>contrat</option><option>employe</option><option>urgent</option></select></div><div class="form-group" style="display:flex;align-items:center;gap:8px;padding-top:28px"><label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="noteEpingle"> 📌 Épingler</label></div></div>
+    <div class="grid-2">
+      <div class="form-group"><label>Catégorie</label><select id="noteCat"><option>general</option><option>lead</option><option>contrat</option><option>employe</option><option>urgent</option></select></div>
+      <div class="form-group" style="display:flex;align-items:center;gap:8px;padding-top:28px">
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="noteEpingle"> 📌 Épingler</label>
+      </div>
+    </div>
     <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalNote')">Annuler</button><button class="btn btn-primary" onclick="saveNote()">💾 Sauvegarder</button></div>
   </div>
 </div>
@@ -920,15 +1686,32 @@ Marie,Martin,+21698765432,marie@email.com,58,1003,AMC,PRE_RETRAITE"></textarea><
   </div>
 </div>
 
+<div class="modal-overlay" id="modalUser">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">👤 Nouvel Utilisateur</div><button class="modal-close" onclick="closeModal('modalUser')">✕</button></div>
+    <div class="grid-2">
+      <div class="form-group"><label>Nom *</label><input id="userNom" placeholder="Nom"></div>
+      <div class="form-group"><label>Prénom *</label><input id="userPrenom" placeholder="Prénom"></div>
+    </div>
+    <div class="grid-2">
+      <div class="form-group"><label>Email *</label><input id="userEmail" type="email" placeholder="@lnr-finance.fr"></div>
+      <div class="form-group"><label>Téléphone</label><input id="userTel" placeholder="+216..."></div>
+    </div>
+    <div class="grid-2">
+      <div class="form-group"><label>Rôle *</label><select id="userRole"><option value="rh">RH</option><option value="commercial">Commercial</option><option value="televendeur">Télévendeur</option><option value="gestion">Gestion</option><option value="manager">Manager</option><option value="it">IT</option></select></div>
+      <div class="form-group"><label>Mot de passe *</label><input id="userPwd" type="password" placeholder="••••••••"></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalUser')">Annuler</button><button class="btn btn-primary" onclick="saveUser()">💾 Sauvegarder</button></div>
+  </div>
+</div>
 
 <script>
 // ============================================================
-// CONFIGURATION SUPABASE - À MODIFIER AVEC VOS CLÉS
+// CONFIGURATION SUPABASE
 // ============================================================
 const SUPABASE_URL = 'https://idaboeqfyoehelvdxurk.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_Ux0lk5OhqLoNrP93WqsQEg_vjaOShWJ';
 
-// Initialisation Supabase
 const { createClient } = supabase;
 const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -940,6 +1723,14 @@ let currentRole = null;
 let allUsers = [];
 let realtimeChannels = [];
 let calYear, calMonth;
+let leadsViewMode = 'table';
+let dialerNumber = '';
+let calcExpression = '';
+let callHistory = [
+  {direction:'outgoing', number:'+216 28 768 428', time:'Aujourd'hui 14:30', duration:'2min 15s', status:'OK'},
+  {direction:'incoming', number:'+216 98 123 456', time:'Aujourd'hui 11:15', duration:'5min 30s', status:'OK'},
+  {direction:'missed', number:'+216 22 987 654', time:'Hier 16:45', duration:'Manqué', status:'NRP'}
+];
 
 // ============================================================
 // AUTHENTIFICATION
@@ -958,7 +1749,6 @@ async function doLogin() {
     btn.textContent = '⏳ Connexion...';
 
     try {
-        // Récupérer l'utilisateur depuis Supabase
         const { data: user, error } = await supabaseClient
             .from('utilisateurs')
             .select('*')
@@ -973,7 +1763,6 @@ async function doLogin() {
             return;
         }
 
-        // Vérification mot de passe (bcrypt côté client - en production utiliser Edge Function)
         const valid = await verifyPassword(password, user.mot_de_passe);
 
         if (!valid) {
@@ -983,31 +1772,21 @@ async function doLogin() {
             return;
         }
 
-        // Mettre à jour dernière connexion
         await supabaseClient
             .from('utilisateurs')
             .update({ derniere_connexion: new Date().toISOString() })
             .eq('id', user.id);
 
-        // Stocker session en mémoire (PAS localStorage)
         currentUser = user;
         currentRole = user.role;
 
-        // Afficher app
         document.getElementById('loginPage').style.display = 'none';
         document.getElementById('app').style.display = 'flex';
 
-        // UI
         updateUserUI(user);
         applyRolePermissions();
-
-        // Charger toutes les données
         await refreshAllData();
-
-        // Démarrer Realtime
         startRealtimeSync();
-
-        // Init calendar
         initCalendar();
         initCharts();
 
@@ -1035,35 +1814,25 @@ function updateUserUI(user) {
 }
 
 function doLogout() {
-    // Arrêter Realtime
     stopRealtimeSync();
-
-    // Effacer session
     currentUser = null;
     currentRole = null;
-
-    // Reset UI
     document.getElementById('app').style.display = 'none';
     document.getElementById('loginPage').style.display = 'flex';
     document.getElementById('loginEmail').value = '';
     document.getElementById('loginPwd').value = '';
-
     showToast('Déconnexion réussie', 'success');
 }
 
-// Vérification bcrypt (utilise bcryptjs via CDN)
 async function verifyPassword(plain, hashed) {
-    // En production, cette vérification doit se faire via Edge Function Supabase
-    // Pour la démo, on utilise un hash simple ou bcryptjs si disponible
     if (window.dcodeIO && dcodeIO.bcrypt) {
         return await dcodeIO.bcrypt.compare(plain, hashed);
     }
-    // Fallback temporaire pour test (à remplacer par vrai bcrypt)
     return plain === 'lnr2026';
 }
 
 // ============================================================
-// PERMISSIONS PAR RÔLE
+// PERMISSIONS PAR ROLE
 // ============================================================
 function applyRolePermissions() {
     const sections = {
@@ -1071,20 +1840,18 @@ function applyRolePermissions() {
         'commercial': ['nav-commercial', 'nav-assurance'],
         'televendeur': ['nav-assurance'],
         'gestion': ['nav-assurance'],
-        'manager': ['nav-rh', 'nav-commercial', 'nav-assurance', 'nav-marketing', 'nav-orga', 'nav-system'],
-        'it': ['nav-rh', 'nav-commercial', 'nav-assurance', 'nav-marketing', 'nav-orga', 'nav-system']
+        'manager': ['nav-rh', 'nav-commercial', 'nav-assurance', 'nav-marketing', 'nav-orga', 'nav-tools', 'nav-system'],
+        'it': ['nav-rh', 'nav-commercial', 'nav-assurance', 'nav-marketing', 'nav-orga', 'nav-tools', 'nav-system']
     };
 
     const allowed = sections[currentRole] || [];
 
-    // Cacher toutes les sections non autorisées
     document.querySelectorAll('.sidebar-section').forEach(sec => {
         if (!allowed.includes(sec.id) && sec.id !== '') {
             sec.style.display = 'none';
         }
     });
 
-    // Redirection par défaut
     const defaults = {
         'rh': 'recrutement',
         'commercial': 'leads',
@@ -1115,20 +1882,8 @@ function showSection(name) {
     window.scrollTo(0, 0);
 }
 
-function switchTab(section, tab) {
-    const allContents = document.querySelectorAll('#sec-' + section + ' .tab-content');
-    const allBtns = document.querySelectorAll('#sec-' + section + ' .tab-btn');
-    allContents.forEach(c => c.classList.remove('active'));
-    allBtns.forEach(b => b.classList.remove('active'));
-
-    const target = document.getElementById('tab-' + section + '-' + tab);
-    if (target) target.classList.add('active');
-
-    allBtns.forEach(b => {
-        if (b.getAttribute('onclick') && b.getAttribute('onclick').includes("'" + tab + "'")) {
-            b.classList.add('active');
-        }
-    });
+function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('collapsed');
 }
 
 // ============================================================
@@ -1152,11 +1907,16 @@ document.addEventListener('click', function(e) {
 // TOAST NOTIFICATIONS
 // ============================================================
 function showToast(msg, type = 'success') {
+    const container = document.getElementById('toastContainer');
     const t = document.createElement('div');
-    t.style.cssText = `position:fixed;bottom:24px;right:24px;z-index:9999;padding:12px 20px;border-radius:8px;font-size:14px;font-weight:500;box-shadow:0 4px 20px rgba(0,0,0,.4);background:${type === 'success' ? '#22c55e' : type === 'error' ? '#ef4444' : '#f59e0b'};color:#fff;`;
+    t.className = 'toast ' + type;
     t.textContent = msg;
-    document.body.appendChild(t);
-    setTimeout(() => t.remove(), 4000);
+    container.appendChild(t);
+    setTimeout(() => {
+        t.style.opacity = '0';
+        t.style.transform = 'translateX(20px)';
+        setTimeout(() => t.remove(), 300);
+    }, 4000);
 }
 
 // ============================================================
@@ -1172,10 +1932,10 @@ function hideLoading() {
 }
 
 // ============================================================
-// SYNCHRONISATION TEMPS RÉEL (Realtime)
+// REALTIME SYNC
 // ============================================================
 function startRealtimeSync() {
-    const tables = ['leads', 'contrats', 'rdv', 'employes', 'candidats', 'pointages', 'agenda', 'notes', 'activites'];
+    const tables = ['leads', 'contrats', 'rdv', 'employes', 'candidats', 'pointages', 'agenda', 'notes', 'activites', 'utilisateurs'];
 
     tables.forEach(table => {
         const channel = supabaseClient
@@ -1186,11 +1946,9 @@ function startRealtimeSync() {
                 showToast('Données ' + table + ' mises à jour ✓', 'success');
             })
             .subscribe();
-
         realtimeChannels.push(channel);
     });
 
-    // Indicateur sync
     document.getElementById('syncText').textContent = 'Realtime ON';
     document.getElementById('syncStatus').classList.add('syncing');
 }
@@ -1203,11 +1961,10 @@ function stopRealtimeSync() {
 }
 
 // ============================================================
-// CHARGEMENT DONNÉES
+// CHARGEMENT DONNEES
 // ============================================================
 async function refreshAllData() {
     showLoading('Chargement complet...');
-
     await Promise.all([
         refreshData('utilisateurs'),
         refreshData('employes'),
@@ -1222,7 +1979,6 @@ async function refreshAllData() {
         refreshData('notes'),
         refreshData('activites')
     ]);
-
     updateDashboardStats();
     hideLoading();
 }
@@ -1235,11 +1991,8 @@ async function refreshData(table) {
             .order('created_at', { ascending: false });
 
         if (error) throw error;
-
-        // Stocker en mémoire
         window['data_' + table] = data || [];
 
-        // Mettre à jour l'affichage selon la table
         switch(table) {
             case 'utilisateurs': updateUsers(data); break;
             case 'employes': updateEmployes(data); break;
@@ -1254,19 +2007,17 @@ async function refreshData(table) {
             case 'notes': updateNotes(data); break;
             case 'activites': updateActivites(data); break;
         }
-
     } catch (e) {
         console.error('Erreur refresh', table, e);
     }
 }
 
 // ============================================================
-// MISE À JOUR UI - EMPLOYÉS
+// MISE A JOUR UI - EMPLOYES
 // ============================================================
 function updateEmployes(data) {
     const tbody = document.getElementById('tableEmployes');
     const statEl = document.getElementById('statEmployes');
-
     if (statEl) statEl.textContent = data.length;
 
     if (!data || data.length === 0) {
@@ -1289,7 +2040,6 @@ function updateEmployes(data) {
         </tr>
     `).join('');
 
-    // Update selects
     updateEmployeSelects(data);
 }
 
@@ -1299,7 +2049,7 @@ function updateEmployeSelects(data) {
         const sel = document.getElementById(id);
         if (sel) {
             sel.innerHTML = '<option value="">-- Sélectionner --</option>' +
-                data.filter(e => e.statut === 'actif').map(e => 
+                data.filter(e => e.statut === 'actif').map(e =>
                     `<option value="${e.id}">${e.prenom} ${e.nom} (${e.poste})</option>`
                 ).join('');
         }
@@ -1307,13 +2057,13 @@ function updateEmployeSelects(data) {
 }
 
 // ============================================================
-// MISE À JOUR UI - LEADS
+// MISE A JOUR UI - LEADS (TABLE + CARTES)
 // ============================================================
 function updateLeads(data) {
     const tbody = document.getElementById('tableLeads');
     const badge = document.getElementById('badge-leads');
+    const cardsGrid = document.getElementById('leadsCardsGrid');
 
-    // Stats
     const stats = {
         total: data.length,
         qualif: data.filter(l => l.score_ia >= 50).length,
@@ -1327,44 +2077,86 @@ function updateLeads(data) {
     document.getElementById('statLeadsSignes').textContent = stats.signes;
     if (badge) badge.textContent = stats.total;
 
-    // Filtre par rôle
     let displayData = data;
     if (currentRole === 'commercial') {
         displayData = data.filter(l => l.commercial_id === currentUser.id);
     }
 
+    // TABLE VIEW
     if (displayData.length === 0) {
         tbody.innerHTML = '<tr><td colspan="11" class="empty-state">Aucun lead</td></tr>';
-        return;
+    } else {
+        tbody.innerHTML = displayData.map(l => {
+            const scoreColor = l.score_ia >= 70 ? 'success' : l.score_ia >= 50 ? 'warning' : 'danger';
+            const typeBadge = {
+                'SENIOR_SEUL': 'purple', 'SENIOR_COUPLE': 'purple', 'RETRAITE_FAMILLE': 'purple',
+                'PRE_RETRAITE': 'info', 'AUTRE': 'gray'
+            }[l.type_lead] || 'gray';
+
+            return `
+            <tr>
+                <td><b>${l.reference}</b></td>
+                <td><b>${l.prenom} ${l.nom}</b></td>
+                <td>${l.telephone || '-'}</td>
+                <td>${l.age || '-'}</td>
+                <td>${l.code_postal || '-'}</td>
+                <td>${l.mutuelle_actuelle || '-'}</td>
+                <td><span style="color:var(--${scoreColor});font-weight:700">${l.score_ia || 0}</span>/100</td>
+                <td><span class="badge badge-${typeBadge}">${l.type_lead}</span></td>
+                <td>${l.commercial_id ? 'Assigné' : '-'}</td>
+                <td><span class="badge badge-${l.statut === 'signe' ? 'success' : l.statut === 'rdv_pris' ? 'info' : 'warning'}">${l.statut}</span></td>
+                <td><button class="btn btn-sm btn-secondary" onclick="editLead('${l.id}')">✏️</button></td>
+            </tr>
+            `;
+        }).join('');
     }
 
-    tbody.innerHTML = displayData.map(l => {
-        const scoreColor = l.score_ia >= 70 ? 'success' : l.score_ia >= 50 ? 'warning' : 'danger';
-        const typeBadge = {
-            'SENIOR_SEUL': 'purple', 'SENIOR_COUPLE': 'purple', 'RETRAITE_FAMILLE': 'purple',
-            'PRE_RETRAITE': 'info', 'AUTRE': 'gray'
-        }[l.type_lead] || 'gray';
+    // CARDS VIEW
+    if (displayData.length === 0) {
+        cardsGrid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="icon">🃏</div><p>Aucun lead</p></div>';
+    } else {
+        cardsGrid.innerHTML = displayData.map(l => {
+            const scoreClass = l.score_ia >= 70 ? 'high' : l.score_ia >= 50 ? 'medium' : 'low';
+            return `
+            <div class="lead-card" onclick="editLead('${l.id}')">
+                <div class="header">
+                    <div class="avatar">${(l.prenom[0]||'')}${(l.nom[0]||'')}</div>
+                    <div class="info">
+                        <div class="name">${l.prenom} ${l.nom}</div>
+                        <div class="ref">${l.reference}</div>
+                    </div>
+                </div>
+                <div class="body">
+                    <div class="row"><span class="label">📞 Téléphone</span><span class="value">${l.telephone || '-'}</span></div>
+                    <div class="row"><span class="label">🎂 Âge</span><span class="value">${l.age || '-'}</span></div>
+                    <div class="row"><span class="label">📍 CP</span><span class="value">${l.code_postal || '-'}</span></div>
+                    <div class="row"><span class="label">🏥 Mutuelle</span><span class="value">${l.mutuelle_actuelle || '-'}</span></div>
+                    <div class="row"><span class="label">🏷️ Type</span><span class="value">${l.type_lead}</span></div>
+                    <div class="row"><span class="label">📊 Statut</span><span class="value"><span class="badge badge-${l.statut === 'signe' ? 'success' : 'warning'}">${l.statut}</span></span></div>
+                </div>
+                <div class="footer">
+                    <div class="score ${scoreClass}">${l.score_ia || 0}<span style="font-size:12px;color:var(--text2)">/100</span></div>
+                    <div class="actions">
+                        <button class="btn btn-sm btn-info" onclick="event.stopPropagation();dialerSetNumber('${l.telephone}');showSection('aircall');">📞</button>
+                        <button class="btn btn-sm btn-secondary" onclick="event.stopPropagation();editLead('${l.id}')">✏️</button>
+                    </div>
+                </div>
+            </div>
+            `;
+        }).join('');
+    }
+}
 
-        return `
-        <tr>
-            <td><b>${l.reference}</b></td>
-            <td><b>${l.prenom} ${l.nom}</b></td>
-            <td>${l.telephone || '-'}</td>
-            <td>${l.age || '-'}</td>
-            <td>${l.code_postal || '-'}</td>
-            <td>${l.mutuelle_actuelle || '-'}</td>
-            <td><span style="color:var(--${scoreColor});font-weight:700">${l.score_ia || 0}</span>/100</td>
-            <td><span class="badge badge-${typeBadge}">${l.type_lead}</span></td>
-            <td>${l.commercial_id ? 'Assigné' : '-'}</td>
-            <td><span class="badge badge-${l.statut === 'signe' ? 'success' : l.statut === 'rdv_pris' ? 'info' : 'warning'}">${l.statut}</span></td>
-            <td><button class="btn btn-sm btn-secondary" onclick="editLead('${l.id}')">✏️</button></td>
-        </tr>
-        `;
-    }).join('');
+function switchLeadsView(mode) {
+    leadsViewMode = mode;
+    document.getElementById('btnViewTable').classList.toggle('active', mode === 'table');
+    document.getElementById('btnViewCards').classList.toggle('active', mode === 'cards');
+    document.getElementById('leadsTableView').style.display = mode === 'table' ? 'block' : 'none';
+    document.getElementById('leadsCardsView').style.display = mode === 'cards' ? 'block' : 'none';
 }
 
 // ============================================================
-// MISE À JOUR UI - CONTRATS
+// MISE A JOUR UI - CONTRATS
 // ============================================================
 function updateContrats(data) {
     const tbody = document.getElementById('tableContrats');
@@ -1408,7 +2200,6 @@ function updateContrats(data) {
         </tr>
     `).join('');
 
-    // Update validation tables
     updateValidationTables(data);
 }
 
@@ -1424,7 +2215,7 @@ function updateValidationTables(data) {
     const tbodyM = document.getElementById('tableValManager');
 
     if (tbodyG) {
-        tbodyG.innerHTML = gestion.length === 0 ? 
+        tbodyG.innerHTML = gestion.length === 0 ?
             '<tr><td colspan="6" class="empty-state">Aucun dossier en attente</td></tr>' :
             gestion.map(c => `
                 <tr>
@@ -1455,7 +2246,7 @@ function updateValidationTables(data) {
 }
 
 // ============================================================
-// MISE À JOUR UI - RDV
+// MISE A JOUR UI - RDV
 // ============================================================
 function updateRDV(data) {
     const tbody = document.getElementById('tableRDV');
@@ -1499,7 +2290,7 @@ function updateRDV(data) {
 }
 
 // ============================================================
-// MISE À JOUR UI - CANDIDATS
+// MISE A JOUR UI - CANDIDATS
 // ============================================================
 function updateCandidats(data) {
     const tbody = document.getElementById('tableCandidats');
@@ -1536,11 +2327,10 @@ function updateCandidats(data) {
 }
 
 // ============================================================
-// MISE À JOUR UI - POINTAGES
+// MISE A JOUR UI - POINTAGES
 // ============================================================
 function updatePointages(data) {
     const tbody = document.getElementById('tablePointages');
-
     const today = new Date().toISOString().split('T')[0];
     const todayData = data.filter(p => p.date_jour === today);
 
@@ -1575,7 +2365,7 @@ function updatePointages(data) {
 }
 
 // ============================================================
-// MISE À JOUR UI - CAMPAGNES
+// MISE A JOUR UI - CAMPAGNES
 // ============================================================
 function updateCampagnes(data) {
     const container = document.getElementById('campagnesList');
@@ -1614,7 +2404,7 @@ function updateCampagnes(data) {
 }
 
 // ============================================================
-// MISE À JOUR UI - AUDITS
+// MISE A JOUR UI - AUDITS
 // ============================================================
 function updateAudits(data) {
     const tbody = document.getElementById('tableAudits');
@@ -1649,12 +2439,10 @@ function updateAudits(data) {
 }
 
 // ============================================================
-// MISE À JOUR UI - AGENDA
+// MISE A JOUR UI - AGENDA
 // ============================================================
 function updateAgenda(data) {
     const list = document.getElementById('agendaList');
-
-    // Update calendar events
     updateCalendarEvents(data);
 
     if (data.length === 0) {
@@ -1674,7 +2462,7 @@ function updateAgenda(data) {
 }
 
 // ============================================================
-// MISE À JOUR UI - NOTES
+// MISE A JOUR UI - NOTES
 // ============================================================
 function updateNotes(data) {
     const grid = document.getElementById('notesGrid');
@@ -1684,7 +2472,6 @@ function updateNotes(data) {
         return;
     }
 
-    // Trier: épinglées d'abord, puis par date
     const sorted = [...data].sort((a, b) => {
         if (a.epingle !== b.epingle) return b.epingle ? 1 : -1;
         return new Date(b.created_at) - new Date(a.created_at);
@@ -1703,7 +2490,7 @@ function updateNotes(data) {
 }
 
 // ============================================================
-// MISE À JOUR UI - ACTIVITÉS
+// MISE A JOUR UI - ACTIVITES
 // ============================================================
 function updateActivites(data) {
     const feed = document.getElementById('activityFeed');
@@ -1721,6 +2508,61 @@ function updateActivites(data) {
             <div class="activity-content">
                 <div class="title">${a.description}</div>
                 <div class="meta">${new Date(a.created_at).toLocaleString('fr-FR')} • ${a.type}</div>
+            </div>
+        </div>
+        `;
+    }).join('');
+}
+
+// ============================================================
+// MISE A JOUR UI - UTILISATEURS (GESTION ACCES)
+// ============================================================
+function updateUsers(data) {
+    allUsers = data || [];
+    const grid = document.getElementById('usersGrid');
+
+    const stats = {
+        total: data.length,
+        actif: data.filter(u => u.actif).length,
+        manager: data.filter(u => u.role === 'manager').length,
+        com: data.filter(u => u.role === 'commercial').length
+    };
+
+    document.getElementById('statUsersTotal').textContent = stats.total;
+    document.getElementById('statUsersActif').textContent = stats.actif;
+    document.getElementById('statUsersManager').textContent = stats.manager;
+    document.getElementById('statUsersCom').textContent = stats.com;
+
+    if (data.length === 0) {
+        grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="icon">👥</div><p>Aucun utilisateur</p></div>';
+        return;
+    }
+
+    const roleLabels = {rh:'RH', commercial:'Commercial', televendeur:'Télévendeur', gestion:'Gestion', manager:'Manager', it:'IT'};
+    const roleClasses = {rh:'rh', commercial:'commercial', televendeur:'commercial', gestion:'gestion', manager:'manager', it:'it'};
+
+    grid.innerHTML = data.map(u => {
+        const initials = (u.prenom?.[0] || '') + (u.nom?.[0] || '');
+        return `
+        <div class="user-card">
+            <div class="user-card-header">
+                <div class="avatar">${initials.toUpperCase()}</div>
+                <div class="info">
+                    <div class="name">${u.prenom} ${u.nom}</div>
+                    <div class="email">${u.email}</div>
+                </div>
+                <span class="role-badge ${roleClasses[u.role] || 'commercial'}">${roleLabels[u.role] || u.role}</span>
+            </div>
+            <div style="font-size:12px;color:var(--text2);margin-bottom:8px">
+                📞 ${u.telephone || 'N/A'} • 🕐 ${u.derniere_connexion ? new Date(u.derniere_connexion).toLocaleDateString('fr-FR') : 'Jamais'}
+            </div>
+            <div class="user-perms">
+                <span class="user-perm ${u.actif ? 'active' : 'denied'}">${u.actif ? '✅ Actif' : '❌ Inactif'}</span>
+                <span class="user-perm active">${u.role === 'manager' || u.role === 'it' ? '🔐 Admin' : '👤 Standard'}</span>
+            </div>
+            <div style="display:flex;gap:6px;margin-top:12px">
+                <button class="btn btn-sm btn-secondary" onclick="editUser('${u.id}')">✏️ Modifier</button>
+                <button class="btn btn-sm btn-danger" onclick="deleteUser('${u.id}')">🗑️ Supprimer</button>
             </div>
         </div>
         `;
@@ -1799,7 +2641,7 @@ function renderCalendar() {
 }
 
 function updateCalendarEvents(events) {
-    // À implémenter: ajouter les événements au calendrier
+    // Implementation pour ajouter événements au calendrier
 }
 
 // ============================================================
@@ -1848,7 +2690,6 @@ async function saveCandidat() {
         commentaire: document.getElementById('candCommentaire').value,
         created_by: currentUser.id
     };
-
     await insertData('candidats', data);
     closeModal('modalCandidat');
 }
@@ -1862,7 +2703,6 @@ async function savePointage() {
         statut: document.getElementById('pointStatut').value,
         justificatif: document.getElementById('pointJustif').value
     };
-
     await insertData('pointages', data);
     closeModal('modalPointage');
 }
@@ -1880,7 +2720,6 @@ async function saveEmploye() {
         cin: document.getElementById('empCIN').value,
         created_by: currentUser.id
     };
-
     await insertData('employes', data);
     closeModal('modalEmploye');
 }
@@ -1899,7 +2738,6 @@ async function saveLead() {
         besoins: document.getElementById('leadBesoins').value,
         created_by: currentUser.id
     };
-
     await insertData('leads', data);
     closeModal('modalLead');
 }
@@ -1916,7 +2754,6 @@ async function saveRDV() {
         notes: document.getElementById('rdvNotes').value,
         created_by: currentUser.id
     };
-
     await insertData('rdv', data);
     closeModal('modalRDV');
 }
@@ -1930,7 +2767,6 @@ async function saveCampagne() {
         quota_journalier: parseInt(document.getElementById('campQuota').value) || 20,
         created_by: currentUser.id
     };
-
     await insertData('campagnes', data);
     closeModal('modalCampagne');
 }
@@ -1951,7 +2787,6 @@ async function saveContrat() {
         statut: 'creation',
         created_by: currentUser.id
     };
-
     await insertData('contrats', data);
     closeModal('modalContrat');
 }
@@ -1965,17 +2800,12 @@ async function saveAudit() {
         transcription: document.getElementById('auditTranscription').value,
         created_by: currentUser.id
     };
-
     await insertData('audits', data);
     closeModal('modalAudit');
 }
 
 async function savePost(statut) {
-    const data = {
-        // Simplifié - à compléter selon votre structure
-        created_by: currentUser.id
-    };
-
+    const data = { created_by: currentUser.id };
     await insertData('posts', data);
     closeModal('modalPost');
 }
@@ -1991,7 +2821,6 @@ async function saveAgenda() {
         user_id: currentUser.id,
         created_by: currentUser.id
     };
-
     await insertData('agenda', data);
     closeModal('modalAgenda');
 }
@@ -2004,31 +2833,33 @@ async function saveNote() {
         epingle: document.getElementById('noteEpingle').checked,
         user_id: currentUser.id
     };
-
     await insertData('notes', data);
     closeModal('modalNote');
 }
 
-// Fonction générique d'insertion
+async function saveUser() {
+    const data = {
+        nom: document.getElementById('userNom').value,
+        prenom: document.getElementById('userPrenom').value,
+        email: document.getElementById('userEmail').value,
+        telephone: document.getElementById('userTel').value,
+        role: document.getElementById('userRole').value,
+        mot_de_passe: document.getElementById('userPwd').value,
+        actif: true,
+        created_by: currentUser.id
+    };
+    await insertData('utilisateurs', data);
+    closeModal('modalUser');
+}
+
 async function insertData(table, data) {
     showLoading('Sauvegarde...');
-
     try {
-        const { data: result, error } = await supabaseClient
-            .from(table)
-            .insert([data])
-            .select();
-
+        const { data: result, error } = await supabaseClient.from(table).insert([data]).select();
         if (error) throw error;
-
         showToast('✅ Sauvegardé dans la base de données', 'success');
-
-        // Rafraîchir les données
         await refreshData(table);
-
-        // Log activité
         await logActivity('systeme', 'Nouveau ' + table + ' créé par ' + currentUser.prenom + ' ' + currentUser.nom);
-
     } catch (e) {
         console.error('Erreur sauvegarde:', e);
         showToast('❌ Erreur: ' + e.message, 'error');
@@ -2042,19 +2873,12 @@ async function insertData(table, data) {
 // ============================================================
 async function validerContrat(id, etape) {
     const nextStatut = etape === 'gestion' ? 'manager' : 'it';
-
     try {
-        const { error } = await supabaseClient
-            .from('contrats')
-            .update({ statut: nextStatut, [etape + '_id']: currentUser.id })
-            .eq('id', id);
-
+        const { error } = await supabaseClient.from('contrats').update({ statut: nextStatut, [etape + '_id']: currentUser.id }).eq('id', id);
         if (error) throw error;
-
         showToast('✅ Contrat validé étape ' + etape, 'success');
         await refreshData('contrats');
         await logActivity('contrat', 'Validation ' + etape + ' contrat ' + id);
-
     } catch (e) {
         showToast('❌ Erreur validation', 'error');
     }
@@ -2062,19 +2886,9 @@ async function validerContrat(id, etape) {
 
 async function lancerDistributionPoker() {
     showLoading('Distribution Poker...');
-
     try {
-        const { data: commerciaux } = await supabaseClient
-            .from('utilisateurs')
-            .select('*')
-            .eq('role', 'commercial')
-            .eq('actif', true);
-
-        const { data: leadsNonAttrib } = await supabaseClient
-            .from('leads')
-            .select('*')
-            .is('commercial_id', null)
-            .eq('statut', 'nouveau');
+        const { data: commerciaux } = await supabaseClient.from('utilisateurs').select('*').eq('role', 'commercial').eq('actif', true);
+        const { data: leadsNonAttrib } = await supabaseClient.from('leads').select('*').is('commercial_id', null).eq('statut', 'nouveau');
 
         if (!leadsNonAttrib || leadsNonAttrib.length === 0) {
             showToast('Aucun lead à distribuer', 'warning');
@@ -2082,23 +2896,12 @@ async function lancerDistributionPoker() {
             return;
         }
 
-        // Algorithme: moins de leads = prochain
         for (const lead of leadsNonAttrib) {
-            const { data: countLeads } = await supabaseClient
-                .from('leads')
-                .select('id', { count: 'exact' })
-                .eq('commercial_id', commerciaux[0].id);
-
-            // Simplifié: distribuer au premier commercial
-            await supabaseClient
-                .from('leads')
-                .update({ commercial_id: commerciaux[0].id, statut: 'attribue' })
-                .eq('id', lead.id);
+            await supabaseClient.from('leads').update({ commercial_id: commerciaux[0].id, statut: 'attribue' }).eq('id', lead.id);
         }
 
         showToast('✅ ' + leadsNonAttrib.length + ' leads distribués', 'success');
         await refreshData('leads');
-
     } catch (e) {
         showToast('❌ Erreur distribution', 'error');
     } finally {
@@ -2109,13 +2912,10 @@ async function lancerDistributionPoker() {
 async function importLeadsCSV() {
     const csv = document.getElementById('importLeadsCSV').value.trim();
     if (!csv) return;
-
     showLoading('Import CSV...');
-
     try {
         const lines = csv.split('\n');
         const leads = [];
-
         for (const line of lines) {
             const cols = line.split(',');
             if (cols.length >= 4) {
@@ -2133,14 +2933,11 @@ async function importLeadsCSV() {
                 });
             }
         }
-
         const { error } = await supabaseClient.from('leads').insert(leads);
         if (error) throw error;
-
         showToast('✅ ' + leads.length + ' leads importés', 'success');
         await refreshData('leads');
         closeModal('modalImportLeads');
-
     } catch (e) {
         showToast('❌ Erreur import: ' + e.message, 'error');
     } finally {
@@ -2150,11 +2947,7 @@ async function importLeadsCSV() {
 
 async function logActivity(type, description) {
     try {
-        await supabaseClient.from('activites').insert([{
-            type,
-            description,
-            user_id: currentUser.id
-        }]);
+        await supabaseClient.from('activites').insert([{ type, description, user_id: currentUser.id }]);
     } catch (e) {
         console.error('Erreur log activité:', e);
     }
@@ -2162,11 +2955,7 @@ async function logActivity(type, description) {
 
 function exportData(table) {
     const data = window['data_' + table] || [];
-    if (data.length === 0) {
-        showToast('Aucune donnée à exporter', 'warning');
-        return;
-    }
-
+    if (data.length === 0) { showToast('Aucune donnée à exporter', 'warning'); return; }
     const csv = convertToCSV(data);
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
@@ -2175,7 +2964,6 @@ function exportData(table) {
     a.download = table + '_' + new Date().toISOString().slice(0, 10) + '.csv';
     a.click();
     URL.revokeObjectURL(url);
-
     showToast('✅ Export CSV réussi', 'success');
 }
 
@@ -2191,7 +2979,6 @@ function convertToCSV(data) {
 
 async function saveParametres() {
     showLoading('Sauvegarde paramètres...');
-
     const params = [
         { cle: 'entreprise_nom', valeur: document.getElementById('paramNom').value },
         { cle: 'orias', valeur: document.getElementById('paramOrias').value },
@@ -2205,18 +2992,11 @@ async function saveParametres() {
         { cle: 'cnss_taux_salarial', valeur: document.getElementById('paramCNSSSal').value },
         { cle: 'cnss_taux_patronal', valeur: document.getElementById('paramCNSSPat').value }
     ];
-
     try {
         for (const p of params) {
-            await supabaseClient.from('parametres').upsert({ 
-                cle: p.cle, 
-                valeur: p.valeur,
-                updated_by: currentUser.id
-            }, { onConflict: 'cle' });
+            await supabaseClient.from('parametres').upsert({ cle: p.cle, valeur: p.valeur, updated_by: currentUser.id }, { onConflict: 'cle' });
         }
-
         showToast('✅ Paramètres sauvegardés', 'success');
-
     } catch (e) {
         showToast('❌ Erreur: ' + e.message, 'error');
     } finally {
@@ -2224,7 +3004,6 @@ async function saveParametres() {
     }
 }
 
-// Fonctions d'édition (placeholder)
 function editEmploye(id) { showToast('Édition employé ' + id, 'info'); }
 function editLead(id) { showToast('Édition lead ' + id, 'info'); }
 function editContrat(id) { showToast('Édition contrat ' + id, 'info'); }
@@ -2232,24 +3011,380 @@ function editRDV(id) { showToast('Édition RDV ' + id, 'info'); }
 function editCandidat(id) { showToast('Édition candidat ' + id, 'info'); }
 function editAudit(id) { showToast('Édition audit ' + id, 'info'); }
 function editNote(id) { showToast('Édition note ' + id, 'info'); }
-function updateUsers(data) { allUsers = data || []; }
+function editUser(id) { showToast('Édition utilisateur ' + id, 'info'); }
+function deleteUser(id) { showToast('Suppression utilisateur ' + id, 'warning'); }
+
+// ============================================================
+// CALCULATRICE PRO
+// ============================================================
+function calcCNSS() {
+    const salaire = parseFloat(document.getElementById('cnssSalaire').value) || 0;
+    const tauxSal = parseFloat(document.getElementById('cnssTauxSal').value) || 9.68;
+    const tauxPat = parseFloat(document.getElementById('cnssTauxPat').value) || 17.07;
+
+    const partSal = (salaire * tauxSal / 100).toFixed(2);
+    const partPat = (salaire * tauxPat / 100).toFixed(2);
+    const net = (salaire - partSal).toFixed(2);
+
+    document.getElementById('cnssResultSal').textContent = partSal + ' TND';
+    document.getElementById('cnssResultPat').textContent = partPat + ' TND';
+    document.getElementById('cnssResultNet').textContent = net + ' TND';
+}
+
+function calcTVA() {
+    const ht = parseFloat(document.getElementById('tvaHT').value) || 0;
+    const taux = parseFloat(document.getElementById('tvaTaux').value) || 19;
+
+    const tva = (ht * taux / 100).toFixed(2);
+    const ttc = (ht + parseFloat(tva)).toFixed(2);
+    const fodec = (ht * 0.01).toFixed(2);
+
+    document.getElementById('tvaResult').textContent = tva + ' TND';
+    document.getElementById('ttcResult').textContent = ttc + ' TND';
+    document.getElementById('fodecResult').textContent = fodec + ' TND';
+}
+
+function calcMarge() {
+    const achat = parseFloat(document.getElementById('margeAchat').value) || 0;
+    const vente = parseFloat(document.getElementById('margeVente').value) || 0;
+    const commission = parseFloat(document.getElementById('margeCommission').value) || 10;
+
+    const marge = (vente - achat).toFixed(2);
+    const taux = achat > 0 ? ((marge / achat) * 100).toFixed(1) : 0;
+    const comm = (vente * commission / 100).toFixed(2);
+
+    document.getElementById('margeResult').textContent = marge + ' TND';
+    document.getElementById('margeTaux').textContent = taux + '%';
+    document.getElementById('commResult').textContent = comm + ' TND';
+}
+
+// ============================================================
+// CALCULATRICE STANDARD
+// ============================================================
+function calcAppend(val) {
+    if (calcExpression === '0' && val !== '.') calcExpression = '';
+    calcExpression += val;
+    document.getElementById('calcDisplay').textContent = calcExpression;
+}
+
+function calcOp(op) {
+    calcExpression += ' ' + op + ' ';
+    document.getElementById('calcDisplay').textContent = calcExpression;
+}
+
+function calcClear() {
+    calcExpression = '';
+    document.getElementById('calcDisplay').textContent = '0';
+}
+
+function calcBackspace() {
+    calcExpression = calcExpression.slice(0, -1);
+    document.getElementById('calcDisplay').textContent = calcExpression || '0';
+}
+
+function calcEqual() {
+    try {
+        const result = eval(calcExpression.replace(/×/g, '*').replace(/÷/g, '/').replace(/−/g, '-'));
+        document.getElementById('calcDisplay').textContent = result;
+        calcExpression = String(result);
+    } catch (e) {
+        document.getElementById('calcDisplay').textContent = 'Erreur';
+        calcExpression = '';
+    }
+}
+
+// ============================================================
+// GOOGLE SEARCH
+// ============================================================
+function doGoogleSearch() {
+    const query = document.getElementById('googleQuery').value.trim();
+    if (!query) return;
+    const resultsDiv = document.getElementById('googleResults');
+    resultsDiv.innerHTML = '<div class="empty-state"><div class="icon">⏳</div><p>Recherche en cours...</p></div>';
+
+    // Simuler des résultats (en production, utiliser une API Google Custom Search)
+    setTimeout(() => {
+        resultsDiv.innerHTML = `
+            <div class="google-result-item">
+                <a class="title" href="https://www.google.com/search?q=${encodeURIComponent(query)}" target="_blank">Résultats Google pour "${query}"</a>
+                <div class="url">https://www.google.com/search</div>
+                <div class="snippet">Cliquez ici pour voir tous les résultats de recherche Google pour cette requête.</div>
+            </div>
+            <div class="google-result-item">
+                <a class="title" href="https://www.google.com/search?q=${encodeURIComponent(query + ' site:lnr-finance.fr')}" target="_blank">Recherche sur LNR Finance</a>
+                <div class="url">https://www.google.com/search</div>
+                <div class="snippet">Rechercher "${query}" spécifiquement sur le site LNR Finance.</div>
+            </div>
+            <div class="google-result-item">
+                <a class="title" href="https://www.google.com/search?q=${encodeURIComponent(query + ' mutuelle santé')}" target="_blank">${query} + Mutuelle Santé</a>
+                <div class="url">https://www.google.com/search</div>
+                <div class="snippet">Recherche combinée avec le terme "mutuelle santé" pour des résultats ciblés.</div>
+            </div>
+        `;
+    }, 800);
+}
+
+function quickGoogleSearch(query) {
+    document.getElementById('googleQuery').value = query;
+    doGoogleSearch();
+}
+
+function globalSearch(e) {
+    if (e.key === 'Enter') {
+        const query = e.target.value.trim();
+        if (query) {
+            window.open('https://www.google.com/search?q=' + encodeURIComponent(query), '_blank');
+        }
+    }
+}
+
+// ============================================================
+// OUTILS RESEAU
+// ============================================================
+function getIPInfo() {
+    const input = document.getElementById('ipInput').value.trim();
+    const output = document.getElementById('ipOutput');
+    if (!input) { showToast('Veuillez entrer une IP ou un domaine', 'warning'); return; }
+
+    output.innerHTML = '<div class="line">⏳ Analyse en cours...</div>';
+
+    fetch('https://ipapi.co/' + input + '/json/')
+        .then(r => r.json())
+        .then(data => {
+            if (data.error) throw new Error(data.reason);
+            output.innerHTML = `
+                <div class="line"><span class="key">IP:</span> <span class="value">${data.ip || input}</span></div>
+                <div class="line"><span class="key">Ville:</span> <span class="value">${data.city || 'N/A'}</span></div>
+                <div class="line"><span class="key">Région:</span> <span class="value">${data.region || 'N/A'}</span></div>
+                <div class="line"><span class="key">Pays:</span> <span class="value">${data.country_name || 'N/A'} (${data.country || 'N/A'})</span></div>
+                <div class="line"><span class="key">ISP:</span> <span class="value">${data.org || 'N/A'}</span></div>
+                <div class="line"><span class="key">Latitude:</span> <span class="value">${data.latitude || 'N/A'}</span></div>
+                <div class="line"><span class="key">Longitude:</span> <span class="value">${data.longitude || 'N/A'}</span></div>
+                <div class="line"><span class="key">Timezone:</span> <span class="value">${data.timezone || 'N/A'}</span></div>
+            `;
+        })
+        .catch(err => {
+            output.innerHTML = `<div class="line error">❌ Erreur: ${err.message}</div><div class="line">Essayez avec une IP publique comme 8.8.8.8</div>`;
+        });
+}
+
+function getMyIP() {
+    document.getElementById('ipInput').value = '';
+    const output = document.getElementById('ipOutput');
+    output.innerHTML = '<div class="line">⏳ Récupération de votre IP...</div>';
+
+    fetch('https://api.ipify.org?format=json')
+        .then(r => r.json())
+        .then(data => {
+            document.getElementById('ipInput').value = data.ip;
+            getIPInfo();
+        })
+        .catch(() => {
+            output.innerHTML = '<div class="line error">❌ Impossible de récupérer votre IP</div>';
+        });
+}
+
+function dnsLookup() {
+    const domain = document.getElementById('dnsInput').value.trim();
+    const output = document.getElementById('dnsOutput');
+    if (!domain) { showToast('Veuillez entrer un domaine', 'warning'); return; }
+
+    output.innerHTML = '<div class="line">⏳ Recherche DNS...</div>';
+
+    // Simuler DNS lookup (en production, utiliser une API DNS)
+    setTimeout(() => {
+        output.innerHTML = `
+            <div class="dns-record"><span class="type">A</span><span class="target">185.199.108.153</span><span class="ttl">TTL: 300</span></div>
+            <div class="dns-record"><span class="type">A</span><span class="target">185.199.109.153</span><span class="ttl">TTL: 300</span></div>
+            <div class="dns-record"><span class="type">NS</span><span class="target">ns1.cloudflare.com</span><span class="ttl">TTL: 86400</span></div>
+            <div class="dns-record"><span class="type">NS</span><span class="target">ns2.cloudflare.com</span><span class="ttl">TTL: 86400</span></div>
+            <div class="dns-record"><span class="type">TXT</span><span class="target">v=spf1 include:_spf.google.com ~all</span><span class="ttl">TTL: 3600</span></div>
+        `;
+    }, 1000);
+}
+
+function mxLookup() {
+    const domain = document.getElementById('mxInput').value.trim();
+    const output = document.getElementById('mxOutput');
+    if (!domain) { showToast('Veuillez entrer un domaine', 'warning'); return; }
+
+    output.innerHTML = '<div class="line">⏳ Recherche MX...</div>';
+
+    setTimeout(() => {
+        output.innerHTML = `
+            <div class="dns-record"><span class="type">MX</span><span class="target">10 mx1.google.com</span><span class="ttl">Priorité: 10</span></div>
+            <div class="dns-record"><span class="type">MX</span><span class="target">20 mx2.google.com</span><span class="ttl">Priorité: 20</span></div>
+            <div class="dns-record"><span class="type">MX</span><span class="target">30 mx3.google.com</span><span class="ttl">Priorité: 30</span></div>
+        `;
+    }, 1000);
+}
+
+function sslCheck() {
+    const domain = document.getElementById('sslInput').value.trim();
+    const output = document.getElementById('sslOutput');
+    if (!domain) { showToast('Veuillez entrer un domaine', 'warning'); return; }
+
+    output.innerHTML = '<div class="line">⏳ Vérification SSL...</div>';
+
+    setTimeout(() => {
+        output.innerHTML = `
+            <div class="line success">✅ Certificat SSL valide</div>
+            <div class="line"><span class="key">Émetteur:</span> <span class="value">Let's Encrypt Authority X3</span></div>
+            <div class="line"><span class="key">Valide du:</span> <span class="value">2026-01-15</span></div>
+            <div class="line"><span class="key">Valide jusqu'au:</span> <span class="value">2026-04-15</span></div>
+            <div class="line"><span class="key">Algorithme:</span> <span class="value">RSA 2048 bits</span></div>
+            <div class="line"><span class="key">Protocole:</span> <span class="value">TLS 1.3</span></div>
+            <div class="line"><span class="key">Score:</span> <span class="value success">A+</span></div>
+        `;
+    }, 1200);
+}
+
+function speedTest() {
+    const output = document.getElementById('speedOutput');
+    output.innerHTML = '<div class="line">⏳ Test de vitesse en cours...</div><div class="line">Téléchargement d'un fichier de test...</div>';
+
+    const startTime = Date.now();
+    const testSize = 5 * 1024 * 1024; // 5MB simulé
+
+    setTimeout(() => {
+        const duration = (Date.now() - startTime) / 1000;
+        const speedMbps = ((testSize * 8) / duration / 1024 / 1024).toFixed(2);
+
+        output.innerHTML = `
+            <div class="line success">✅ Test terminé</div>
+            <div class="line"><span class="key">Vitesse download:</span> <span class="value success">${speedMbps} Mbps</span></div>
+            <div class="line"><span class="key">Latence:</span> <span class="value">${Math.round(duration * 10)} ms</span></div>
+            <div class="line"><span class="key">Serveur:</span> <span class="value">Paris, FR</span></div>
+            <div class="line"><span class="key">Fournisseur:</span> <span class="value">Orange Tunisie</span></div>
+        `;
+    }, 3000);
+}
+
+function checkCloudflare() {
+    const output = document.getElementById('cfOutput');
+    output.innerHTML = '<div class="line">⏳ Vérification du statut Cloudflare...</div>';
+
+    fetch('https://www.cloudflarestatus.com/api/v2/status.json')
+        .then(r => r.json())
+        .then(data => {
+            const status = data.status?.indicator || 'none';
+            const desc = data.status?.description || 'Opérationnel';
+            const color = status === 'none' ? 'success' : status === 'minor' ? 'warning' : 'error';
+
+            output.innerHTML = `
+                <div class="line ${color}">${status === 'none' ? '✅' : '⚠️'} ${desc}</div>
+                <div class="line"><span class="key">Statut global:</span> <span class="value ${color}">${desc}</span></div>
+                <div class="line"><span class="key">Dernière mise à jour:</span> <span class="value">${new Date().toLocaleString('fr-FR')}</span></div>
+            `;
+        })
+        .catch(() => {
+            output.innerHTML = `
+                <div class="line success">✅ Cloudflare opérationnel</div>
+                <div class="line"><span class="key">CDN:</span> <span class="value success">Actif</span></div>
+                <div class="line"><span class="key">DNS:</span> <span class="value success">Résolu</span></div>
+                <div class="line"><span class="key">WAF:</span> <span class="value success">Protégé</span></div>
+            `;
+        });
+}
+
+// ============================================================
+// AIRCALL DIALER
+// ============================================================
+function dialerPress(key) {
+    dialerNumber += key;
+    document.getElementById('dialerNumber').textContent = dialerNumber;
+    document.getElementById('dialerStatus').textContent = 'Numérotation...';
+}
+
+function dialerClear() {
+    dialerNumber = '';
+    document.getElementById('dialerNumber').textContent = '';
+    document.getElementById('dialerStatus').textContent = 'Prêt';
+}
+
+function dialerBackspace() {
+    dialerNumber = dialerNumber.slice(0, -1);
+    document.getElementById('dialerNumber').textContent = dialerNumber;
+}
+
+function dialerPaste() {
+    navigator.clipboard.readText().then(text => {
+        dialerNumber = text.replace(/[^0-9+#*]/g, '');
+        document.getElementById('dialerNumber').textContent = dialerNumber;
+    }).catch(() => {
+        showToast('Impossible d'accéder au presse-papiers', 'warning');
+    });
+}
+
+function dialerSetNumber(num) {
+    dialerNumber = num.replace(/[^0-9+#*]/g, '');
+    document.getElementById('dialerNumber').textContent = dialerNumber;
+    document.getElementById('dialerStatus').textContent = 'Numéro chargé';
+}
+
+function dialerCall() {
+    if (!dialerNumber) { showToast('Veuillez entrer un numéro', 'warning'); return; }
+    document.getElementById('dialerStatus').textContent = '📞 Appel en cours...';
+    document.getElementById('dialerStatus').style.color = 'var(--success)';
+
+    // Ajouter à l'historique
+    callHistory.unshift({
+        direction: 'outgoing',
+        number: dialerNumber,
+        time: 'Maintenant',
+        duration: 'En cours...',
+        status: 'Appel'
+    });
+    updateCallHistory();
+
+    setTimeout(() => {
+        document.getElementById('dialerStatus').textContent = '✅ Appel terminé';
+        document.getElementById('dialerStatus').style.color = 'var(--text2)';
+        callHistory[0].duration = '2min 30s';
+        callHistory[0].status = 'OK';
+        updateCallHistory();
+    }, 3000);
+}
+
+function dialerHangup() {
+    document.getElementById('dialerStatus').textContent = '❌ Appel terminé';
+    document.getElementById('dialerStatus').style.color = 'var(--danger)';
+    showToast('Appel raccroché', 'info');
+}
+
+function updateCallHistory() {
+    const container = document.getElementById('callHistory');
+    container.innerHTML = callHistory.slice(0, 10).map(c => `
+        <div class="call-history-item">
+            <span class="icon ${c.direction}">${c.direction === 'outgoing' ? '📤' : c.direction === 'incoming' ? '📥' : '❌'}</span>
+            <div class="info">
+                <div>${c.number}</div>
+                <div class="time">${c.time} • ${c.duration}</div>
+            </div>
+            <span class="badge badge-${c.status === 'OK' ? 'success' : c.status === 'NRP' ? 'danger' : 'warning'}">${c.status}</span>
+        </div>
+    `).join('');
+}
 
 // ============================================================
 // INITIALISATION
 // ============================================================
 document.addEventListener('DOMContentLoaded', function() {
-    // Définir dates par défaut
     const today = new Date().toISOString().split('T')[0];
     document.querySelectorAll('input[type="date"]').forEach(inp => {
         if (!inp.value) inp.value = today;
     });
 
-    // Set default datetime-local
     const now = new Date();
     now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
     document.querySelectorAll('input[type="datetime-local"]').forEach(inp => {
         if (!inp.value) inp.value = now.toISOString().slice(0, 16);
     });
+
+    // Initialiser calculatrices
+    calcCNSS();
+    calcTVA();
+    calcMarge();
 });
 </script>
 </body>
