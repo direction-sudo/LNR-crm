@@ -457,7 +457,6 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .warning-box{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);border-radius:8px;padding:12px 16px;font-size:13px;color:var(--warning);margin-bottom:16px}
 </style>
 <base target="_blank">
-<base target="_blank">
 </head>
 <body>
 
@@ -538,7 +537,15 @@ tr:hover td{background:rgba(255,255,255,.02)}
         <div class="nav-item" onclick="showSection('parametres')">⚙️ Paramètres</div>
         <div class="nav-item" onclick="showSection('documentation')">📚 Documentation</div>
       </div>
-      </div><!-- end sidebar-nav -->
+              <div class="sidebar-section" id="nav-outils">
+          <div class="sidebar-label">🛠️ Outils & Accès</div>
+          <div class="nav-item" onclick="showSection('calculatrice')">🧮 Calculatrice Pro</div>
+          <div class="nav-item" onclick="showSection('google')">🔍 Google Search</div>
+          <div class="nav-item" onclick="showSection('vpn')">🔒 VPN & Réseau</div>
+          <div class="nav-item" onclick="showSection('aircall')">📞 Aircall Dialer</div>
+          <div class="nav-item" onclick="showSection('acces')">🔐 Gestion Accès</div>
+        </div>
+</div><!-- end sidebar-nav -->
       <!-- SIDEBAR FOOTER -->
       <div class="sidebar-footer">
         <div class="sidebar-user">
@@ -1712,7 +1719,193 @@ LNR FINANCE</textarea></div>
   </div>
 </div>
 
-    </div><!-- end main -->
+    
+
+<!-- ===== CALCULATRICE PRO ===== -->
+<div class="section" id="sec-calculatrice">
+  <div class="page-header">
+    <div><div class="page-title">🧮 Calculatrice Pro</div><div class="page-breadcrumb">LNR / Outils / Calculatrice</div></div>
+  </div>
+  <div class="card" style="max-width:400px;margin:0 auto">
+    <div class="calc-display" id="calcDisplay">0</div>
+    <div class="calc-grid">
+      <div class="calc-btn" onclick="calcClear()">C</div>
+      <div class="calc-btn" onclick="calcOp('(')">(</div>
+      <div class="calc-btn" onclick="calcOp(')')">)</div>
+      <div class="calc-btn op" onclick="calcOp('/')">÷</div>
+      <div class="calc-btn" onclick="calcNum('7')">7</div>
+      <div class="calc-btn" onclick="calcNum('8')">8</div>
+      <div class="calc-btn" onclick="calcNum('9')">9</div>
+      <div class="calc-btn op" onclick="calcOp('*')">×</div>
+      <div class="calc-btn" onclick="calcNum('4')">4</div>
+      <div class="calc-btn" onclick="calcNum('5')">5</div>
+      <div class="calc-btn" onclick="calcNum('6')">6</div>
+      <div class="calc-btn op" onclick="calcOp('-')">-</div>
+      <div class="calc-btn" onclick="calcNum('1')">1</div>
+      <div class="calc-btn" onclick="calcNum('2')">2</div>
+      <div class="calc-btn" onclick="calcNum('3')">3</div>
+      <div class="calc-btn op" onclick="calcOp('+')">+</div>
+      <div class="calc-btn" onclick="calcNum('0')">0</div>
+      <div class="calc-btn" onclick="calcNum('.')">.</div>
+      <div class="calc-btn" onclick="calcBack()">⌫</div>
+      <div class="calc-btn eq" onclick="calcEqual()">=</div>
+    </div>
+  </div>
+  <div class="card mt-16">
+    <div class="card-title">📊 Calculs Rapides Métiers</div>
+    <div class="grid-3">
+      <div class="tool-card" onclick="calcQuick('CNSS')">
+        <div class="icon">🏦</div>
+        <div class="name">CNSS</div>
+        <div class="desc">Calcul cotisations</div>
+      </div>
+      <div class="tool-card" onclick="calcQuick('TVA')">
+        <div class="icon">💰</div>
+        <div class="name">TVA</div>
+        <div class="desc">Calcul taxe 19%</div>
+      </div>
+      <div class="tool-card" onclick="calcQuick('Marge')">
+        <div class="icon">📈</div>
+        <div class="name">Marge</div>
+        <div class="desc">Calcul marge %</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== GOOGLE SEARCH ===== -->
+<div class="section" id="sec-google">
+  <div class="page-header">
+    <div><div class="page-title">🔍 Google Search</div><div class="page-breadcrumb">LNR / Outils / Recherche</div></div>
+  </div>
+  <div class="search-box" style="position:relative">
+    <input type="text" class="search-input" id="googleQuery" placeholder="Rechercher sur Google..." onkeypress="if(event.key==='Enter')googleSearch()">
+    <button class="search-btn" onclick="googleSearch()">🔍</button>
+  </div>
+  <div class="card">
+    <div class="card-title">Résultats Google</div>
+    <iframe id="googleFrame" style="width:100%;height:600px;border:none;border-radius:8px;background:var(--bg3)" src="about:blank"></iframe>
+  </div>
+</div>
+
+<!-- ===== VPN & OUTILS RÉSEAU ===== -->
+<div class="section" id="sec-vpn">
+  <div class="page-header">
+    <div><div class="page-title">🔒 VPN & Outils Réseau</div><div class="page-breadcrumb">LNR / IT / VPN</div></div>
+  </div>
+  <div class="grid-3">
+    <div class="tool-card" onclick="window.open('https://1.1.1.1','_blank')">
+      <div class="icon">🌐</div>
+      <div class="name">Cloudflare WARP</div>
+      <div class="desc">VPN gratuit & rapide</div>
+    </div>
+    <div class="tool-card" onclick="window.open('https://ipinfo.io','_blank')">
+      <div class="icon">📍</div>
+      <div class="name">IP Info</div>
+      <div class="desc">Vérifier votre IP</div>
+    </div>
+    <div class="tool-card" onclick="window.open('https://speedtest.net','_blank')">
+      <div class="icon">⚡</div>
+      <div class="name">Speed Test</div>
+      <div class="desc">Test débit internet</div>
+    </div>
+    <div class="tool-card" onclick="window.open('https://dnschecker.org','_blank')">
+      <div class="icon">🔍</div>
+      <div class="name">DNS Checker</div>
+      <div class="desc">Vérifier propagation DNS</div>
+    </div>
+    <div class="tool-card" onclick="window.open('https://mxtoolbox.com','_blank')">
+      <div class="icon">📧</div>
+      <div class="name">MX Toolbox</div>
+      <div class="desc">Vérifier email & DNS</div>
+    </div>
+    <div class="tool-card" onclick="window.open('https://sslchecker.com','_blank')">
+      <div class="icon">🔐</div>
+      <div class="name">SSL Checker</div>
+      <div class="desc">Vérifier certificat SSL</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== AIRCALL DIALER ===== -->
+<div class="section" id="sec-aircall">
+  <div class="page-header">
+    <div><div class="page-title">📞 Aircall - Dialer</div><div class="page-breadcrumb">LNR / Commercial / Aircall</div></div>
+  </div>
+  <div class="aircall-dialer">
+    <div class="dialer-display" id="dialerDisplay">+216</div>
+    <div class="dialer-grid">
+      <div class="dialer-btn" onclick="dialNum('1')">1</div>
+      <div class="dialer-btn" onclick="dialNum('2')">2</div>
+      <div class="dialer-btn" onclick="dialNum('3')">3</div>
+      <div class="dialer-btn" onclick="dialNum('4')">4</div>
+      <div class="dialer-btn" onclick="dialNum('5')">5</div>
+      <div class="dialer-btn" onclick="dialNum('6')">6</div>
+      <div class="dialer-btn" onclick="dialNum('7')">7</div>
+      <div class="dialer-btn" onclick="dialNum('8')">8</div>
+      <div class="dialer-btn" onclick="dialNum('9')">9</div>
+      <div class="dialer-btn" onclick="dialNum('*')">*</div>
+      <div class="dialer-btn" onclick="dialNum('0')">0</div>
+      <div class="dialer-btn" onclick="dialNum('#')">#</div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <button class="btn btn-success" style="flex:1" onclick="dialCall()">📞 Appeler</button>
+      <button class="btn btn-danger" style="flex:1" onclick="dialClear()">❌ Effacer</button>
+    </div>
+  </div>
+  <div class="card mt-16">
+    <div class="card-title">📋 Historique des appels</div>
+    <div id="callHistory"><div class="empty-state">Aucun appel enregistré</div></div>
+  </div>
+</div>
+
+<!-- ===== PORTAIL GESTION ACCÈS ===== -->
+<div class="section" id="sec-acces">
+  <div class="page-header">
+    <div><div class="page-title">🔐 Portail de Gestion des Accès</div><div class="page-breadcrumb">LNR / IT / Gestion Accès</div></div>
+    <div class="page-actions">
+      <button class="btn btn-sm btn-primary" onclick="openModal('modalUser')">➕ Nouvel Utilisateur</button>
+      <button class="btn btn-sm btn-primary" onclick="loadUsersForAdmin()">🔄 Sync</button>
+    </div>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="label">Utilisateurs actifs</div><div class="value" id="statUsersTotal">-</div></div>
+    <div class="stat-card"><div class="label">Managers</div><div class="value" id="statUsersManager">-</div></div>
+    <div class="stat-card"><div class="label">Commerciaux</div><div class="value" id="statUsersCommercial">-</div></div>
+    <div class="stat-card"><div class="label">Dernier login</div><div class="value" id="statLastLogin">-</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">👥 Utilisateurs du CRM</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Email</th><th>Nom</th><th>Prénom</th><th>Rôle</th><th>Téléphone</th><th>Statut</th><th>Dernière connexion</th><th>Actions</th></tr></thead>
+        <tbody id="tableUsers"><tr><td colspan="8" class="empty-state">Chargement...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">🔑 Permissions par Rôle</div>
+    <div class="access-grid">
+      <div class="access-card">
+        <div class="header"><div class="icon" style="background:rgba(79,142,247,.2)">👔</div><div><div class="title">Manager</div><div class="status">Accès total</div></div></div>
+        <div class="criteria-list"><div class="criteria-item"><span>Dashboard</span><span class="badge badge-success">✓</span></div><div class="criteria-item"><span>Validation</span><span class="badge badge-success">✓</span></div><div class="criteria-item"><span>Paramètres</span><span class="badge badge-success">✓</span></div><div class="criteria-item"><span>Gestion Accès</span><span class="badge badge-success">✓</span></div></div>
+      </div>
+      <div class="access-card">
+        <div class="header"><div class="icon" style="background:rgba(34,197,94,.2)">💼</div><div><div class="title">Commercial</div><div class="status">Leads & Contrats</div></div></div>
+        <div class="criteria-list"><div class="criteria-item"><span>Leads</span><span class="badge badge-success">✓</span></div><div class="criteria-item"><span>Contrats</span><span class="badge badge-success">✓</span></div><div class="criteria-item"><span>Validation</span><span class="badge badge-danger">✗</span></div><div class="criteria-item"><span>Gestion Accès</span><span class="badge badge-danger">✗</span></div></div>
+      </div>
+      <div class="access-card">
+        <div class="header"><div class="icon" style="background:rgba(245,158,11,.2)">👥</div><div><div class="title">RH</div><div class="status">Recrutement & Employés</div></div></div>
+        <div class="criteria-list"><div class="criteria-item"><span>Recrutement</span><span class="badge badge-success">✓</span></div><div class="criteria-item"><span>Employés</span><span class="badge badge-success">✓</span></div><div class="criteria-item"><span>Contrats</span><span class="badge badge-danger">✗</span></div><div class="criteria-item"><span>Gestion Accès</span><span class="badge badge-danger">✗</span></div></div>
+      </div>
+      <div class="access-card">
+        <div class="header"><div class="icon" style="background:rgba(239,68,68,.2)">⚙️</div><div><div class="title">IT / Admin</div><div class="status">Système & Accès</div></div></div>
+        <div class="criteria-list"><div class="criteria-item"><span>Workflows</span><span class="badge badge-success">✓</span></div><div class="criteria-item"><span>Utilisateurs</span><span class="badge badge-success">✓</span></div><div class="criteria-item"><span>Paramètres</span><span class="badge badge-success">✓</span></div><div class="criteria-item"><span>Gestion Accès</span><span class="badge badge-success">✓</span></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+</div><!-- end main -->
   </div><!-- end layout -->
 </div><!-- end app -->
 
@@ -1885,23 +2078,25 @@ LNR FINANCE</textarea></div>
 </div>
 
 
-<script>
+<script><script>
 // ============================================================
-// CONFIGURATION SUPABASE ============================================================
+// CONFIGURATION SUPABASE
+// ============================================================
 const SUPABASE_URL = 'https://idaboeqfyoehelvdxurk.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_Ux0lk5OhqLoNrP93WqsQEg_vjaOShWJ';
 
 const { createClient } = supabase;
 const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-currentUser = null;
-currentRole = null;
+let currentUser = null;
+let currentRole = null;
 let allUsers = [];
 let realtimeChannels = [];
 
 
 // ===== STATE =====
-// currentRole et currentUser sont déjà déclarés plus haut
+let currentRole = 'manager';
+let currentUser = 'M. Zakine';
 let currentRoleName = 'Manager';
 let calYear, calMonth;
 
@@ -1914,79 +2109,25 @@ function selectRole(role, name, label) {
   event.target.classList.add('active');
 }
 
-async function doLogin() {
-    const email = document.getElementById('loginEmail').value.trim();
-    const password = document.getElementById('loginPwd').value;
-    const btn = document.getElementById('loginBtn');
-
-    if (!email || !password) {
-        showToast('Veuillez saisir email et mot de passe', 'error');
-        return;
-    }
-
-    btn.disabled = true;
-    btn.textContent = '⏳ Connexion...';
-
-    try {
-        const { data: user, error } = await supabaseClient
-            .from('utilisateurs')
-            .select('*')
-            .eq('email', email)
-            .eq('actif', true)
-            .maybeSingle();
-
-        if (error || !user) {
-            showToast('Email ou mot de passe incorrect', 'error');
-            btn.disabled = false;
-            btn.textContent = '🔐 Connexion sécurisée';
-            return;
-        }
-
-        if (password !== 'lnr2026') {
-            showToast('Mot de passe incorrect', 'error');
-            btn.disabled = false;
-            btn.textContent = '🔐 Connexion sécurisée';
-            return;
-        }
-
-        await supabaseClient
-            .from('utilisateurs')
-            .update({ derniere_connexion: new Date().toISOString() })
-            .eq('id', user.id);
-
-        currentUser = user;
-        currentRole = user.role;
-
-        document.getElementById('loginPage').style.display = 'none';
-        document.getElementById('app').style.display = 'flex';
-
-        const fullName = user.prenom + ' ' + user.nom;
-        const initials = (user.prenom[0] + user.nom[0]).toUpperCase();
-        document.getElementById('userName').textContent = fullName;
-        document.getElementById('userRole').textContent = user.role;
-        document.getElementById('userAvatar').textContent = initials;
-        document.getElementById('sidebarAvatar').textContent = initials;
-        document.getElementById('sidebarName').textContent = fullName;
-        document.getElementById('sidebarRole').textContent = user.role;
-
-        applyRolePermissions();
-        applyDataFilters();
-        await loadAllData();
-        startRealtimeSync();
-
-        if (currentRole === 'manager' || currentRole === 'it') showSection('dashboard');
-        initCalendar();
-        initCharts();
-
-        showToast('Bienvenue ' + fullName + ' ✓', 'success');
-
-    } catch (e) {
-        console.error('Erreur connexion:', e);
-        showToast('Erreur de connexion', 'error');
-    } finally {
-        btn.disabled = false;
-        btn.textContent = '🔐 Connexion sécurisée';
-    }
+function doLogin() {
+  const email = document.getElementById('loginEmail').value;
+  document.getElementById('loginPage').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  document.getElementById('userName').textContent = currentUser;
+  document.getElementById('userRole').textContent = currentRoleName;
+  const initials = currentUser.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  document.getElementById('userAvatar').textContent = initials;
+  document.getElementById('sidebarAvatar').textContent = initials;
+  document.getElementById('sidebarName').textContent = currentUser;
+  document.getElementById('sidebarRole').textContent = currentRoleName;
+  document.getElementById('topbarInfo').textContent = 'Plateforme Intelligente — ' + currentRoleName;
+  applyRolePermissions(); // gère aussi la section par défaut selon le rôle
+  applyDataFilters();
+  // Dashboard affiché par défaut pour Manager et IT uniquement
+  if (currentRole === 'manager' || currentRole === 'it') showSection('dashboard');
+  initCalendar();
+  initCharts();
+  document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString('fr-FR');
 }
 
 function doLogout() {
@@ -2215,155 +2356,6 @@ function initCharts() {
   const comCtx = document.getElementById('chartCommercial');
   if (comCtx) new Chart(comCtx, {type:'bar',data:{labels:['Nicolas R.','Dupont J.','Bernard P.','Martin S.'],datasets:[{label:'Leads',data:[87,63,54,48],backgroundColor:'rgba(79,142,247,.5)'},{label:'Contrats',data:[22,18,14,12],backgroundColor:'rgba(34,197,94,.5)'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#94a3b8',font:{size:10}}}},scales:{x:{ticks:{color:'#94a3b8'},grid:{color:'#2d3158'}},y:{ticks:{color:'#94a3b8'},grid:{color:'#2d3158'}}}}});
 }
-
-
-// ============================================================
-// FONCTIONS SUPABASE - CHARGEMENT DONNÉES
-// ============================================================
-
-async function loadAllData() {
-    showLoading('Chargement des données...');
-    try {
-        await Promise.all([
-            loadTable('leads', updateLeadsTable),
-            loadTable('contrats', updateContratsTable),
-            loadTable('employes', updateEmployesTable),
-            loadTable('rdv', updateRDVTable),
-            loadTable('candidats', updateCandidatsTable),
-            loadTable('pointages', updatePointagesTable),
-            loadTable('agenda', updateAgendaTable),
-            loadTable('notes', updateNotesTable),
-            loadTable('activites', updateActivitesTable)
-        ]);
-        updateDashboardStats();
-    } catch (e) {
-        console.error('Erreur chargement:', e);
-    } finally {
-        hideLoading();
-    }
-}
-
-async function loadTable(tableName, updateFunction) {
-    try {
-        const { data, error } = await supabaseClient
-            .from(tableName)
-            .select('*')
-            .order('created_at', { ascending: false });
-
-        if (error) throw error;
-        updateFunction(data || []);
-    } catch (e) {
-        console.error('Erreur ' + tableName + ':', e);
-    }
-}
-
-function startRealtimeSync() {
-    const tables = ['leads', 'contrats', 'rdv', 'employes', 'candidats', 'pointages', 'agenda', 'notes', 'activites'];
-    tables.forEach(table => {
-        const channel = supabaseClient
-            .channel('public:' + table)
-            .on('postgres_changes', { event: '*', schema: 'public', table: table }, (payload) => {
-                console.log('Realtime:', table, payload);
-                loadTable(table, getUpdateFunction(table));
-            })
-            .subscribe();
-        realtimeChannels.push(channel);
-    });
-}
-
-function getUpdateFunction(table) {
-    const map = {
-        'leads': updateLeadsTable,
-        'contrats': updateContratsTable,
-        'employes': updateEmployesTable,
-        'rdv': updateRDVTable,
-        'candidats': updateCandidatsTable,
-        'pointages': updatePointagesTable,
-        'agenda': updateAgendaTable,
-        'notes': updateNotesTable,
-        'activites': updateActivitesTable
-    };
-    return map[table] || function(){};
-}
-
-function stopRealtimeSync() {
-    realtimeChannels.forEach(ch => supabaseClient.removeChannel(ch));
-    realtimeChannels = [];
-}
-
-function showLoading(text) {
-    document.querySelector('.loading-text').textContent = text;
-    document.getElementById('loadingOverlay').classList.add('open');
-}
-
-function hideLoading() {
-    document.getElementById('loadingOverlay').classList.remove('open');
-}
-
-// Fonctions de mise à jour UI (à compléter selon vos besoins)
-function updateLeadsTable(data) { console.log('Leads:', data?.length); }
-function updateContratsTable(data) { console.log('Contrats:', data?.length); }
-function updateEmployesTable(data) { console.log('Employes:', data?.length); }
-function updateRDVTable(data) { console.log('RDV:', data?.length); }
-function updateCandidatsTable(data) { console.log('Candidats:', data?.length); }
-function updatePointagesTable(data) { console.log('Pointages:', data?.length); }
-function updateAgendaTable(data) { console.log('Agenda:', data?.length); }
-function updateNotesTable(data) { console.log('Notes:', data?.length); }
-function updateActivitesTable(data) { console.log('Activites:', data?.length); }
-function updateDashboardStats() { console.log('Dashboard updated'); }
-
-// ============================================================
-// CALCULATRICE PRO
-// ============================================================
-let calcExpression = '';
-function calcNum(n) { calcExpression += n; document.getElementById('calcDisplay').textContent = calcExpression || '0'; }
-function calcOp(op) { calcExpression += ' ' + op + ' '; document.getElementById('calcDisplay').textContent = calcExpression; }
-function calcClear() { calcExpression = ''; document.getElementById('calcDisplay').textContent = '0'; }
-function calcBack() { calcExpression = calcExpression.slice(0, -1); document.getElementById('calcDisplay').textContent = calcExpression || '0'; }
-function calcEqual() { try { calcExpression = String(eval(calcExpression)); document.getElementById('calcDisplay').textContent = calcExpression; } catch(e) { document.getElementById('calcDisplay').textContent = 'Erreur'; } }
-function calcQuick(type) {
-    if (type === 'CNSS') { const s = prompt('Salaire brut (TND):'); if(s) { const r = parseFloat(s) * 0.0968; calcExpression = String(r.toFixed(2)); document.getElementById('calcDisplay').textContent = 'CNSS: ' + calcExpression + ' TND'; } }
-    if (type === 'TVA') { const m = prompt('Montant HT (TND):'); if(m) { const r = parseFloat(m) * 1.19; calcExpression = String(r.toFixed(2)); document.getElementById('calcDisplay').textContent = 'TTC: ' + calcExpression + ' TND'; } }
-    if (type === 'Marge') { const a = prompt('Prix achat:'); const v = prompt('Prix vente:'); if(a&&v) { const r = ((parseFloat(v)-parseFloat(a))/parseFloat(a)*100); calcExpression = String(r.toFixed(1)); document.getElementById('calcDisplay').textContent = 'Marge: ' + calcExpression + '%'; } }
-}
-
-// ============================================================
-// GOOGLE SEARCH
-// ============================================================
-function googleSearch() {
-    const q = document.getElementById('googleQuery').value;
-    if (q) document.getElementById('googleFrame').src = 'https://www.google.com/search?q=' + encodeURIComponent(q);
-}
-
-// ============================================================
-// AIRCALL DIALER
-// ============================================================
-let dialNumber = '+216';
-function dialNum(n) { dialNumber += n; document.getElementById('dialerDisplay').textContent = dialNumber; }
-function dialClear() { dialNumber = '+216'; document.getElementById('dialerDisplay').textContent = dialNumber; }
-function dialCall() {
-    window.open('tel:' + dialNumber, '_blank');
-    const hist = document.getElementById('callHistory');
-    if (hist.querySelector('.empty-state')) hist.innerHTML = '';
-    hist.innerHTML += '<div class="activity-item"><div class="activity-dot green"></div><div class="activity-content"><div class="title">Appel à ' + dialNumber + '</div><div class="meta">' + new Date().toLocaleString('fr-FR') + '</div></div></div>';
-}
-
-// ============================================================
-// PORTAIL GESTION ACCES
-// ============================================================
-async function loadUsersForAdmin() {
-    const { data } = await supabaseClient.from('utilisateurs').select('*').order('created_at', { ascending: false });
-    const tbody = document.getElementById('tableUsers');
-    if (!data || data.length === 0) { tbody.innerHTML = '<tr><td colspan="8" class="empty-state">Aucun utilisateur</td></tr>'; return; }
-    document.getElementById('statUsersTotal').textContent = data.length;
-    document.getElementById('statUsersManager').textContent = data.filter(u => u.role === 'manager').length;
-    document.getElementById('statUsersCommercial').textContent = data.filter(u => u.role === 'commercial').length;
-    const last = data.filter(u => u.derniere_connexion).sort((a,b) => new Date(b.derniere_connexion) - new Date(a.derniere_connexion))[0];
-    document.getElementById('statLastLogin').textContent = last ? new Date(last.derniere_connexion).toLocaleDateString('fr-FR') : '-';
-    tbody.innerHTML = data.map(u => '<tr><td>' + u.email + '</td><td><b>' + u.nom + '</b></td><td>' + u.prenom + '</td><td><span class="badge badge-' + (u.role === 'manager' ? 'danger' : u.role === 'it' ? 'warning' : 'info') + '">' + u.role + '</span></td><td>' + (u.telephone || '-') + '</td><td><span class="badge badge-' + (u.actif ? 'success' : 'gray') + '">' + (u.actif ? 'Actif' : 'Inactif') + '</span></td><td>' + (u.derniere_connexion ? new Date(u.derniere_connexion).toLocaleDateString('fr-FR') : '-') + '</td><td><button class="btn btn-sm btn-secondary" onclick="editUser('' + u.id + '')">✏️</button></td></tr>').join('');
-}
-function editUser(id) { showToast('Édition utilisateur ' + id, 'info'); }
-
 </script>
 </body>
 </html>
