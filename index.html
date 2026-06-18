@@ -247,6 +247,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .info-box{background:rgba(79,142,247,.08);border:1px solid rgba(79,142,247,.3);border-radius:8px;padding:12px 16px;font-size:13px;color:var(--accent);margin-bottom:16px}
 .warning-box{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);border-radius:8px;padding:12px 16px;font-size:13px;color:var(--warning);margin-bottom:16px}
 </style>
+<base target="_blank">
 </head>
 <body>
 
@@ -958,7 +959,7 @@ async function doLogin() {
 
     try {
         // Récupérer l'utilisateur depuis Supabase
-        const { data: user, error } = await supabase
+        const { data: user, error } = await supabaseClient
             .from('utilisateurs')
             .select('*')
             .eq('email', email)
@@ -983,7 +984,7 @@ async function doLogin() {
         }
 
         // Mettre à jour dernière connexion
-        await supabase
+        await supabaseClient
             .from('utilisateurs')
             .update({ derniere_connexion: new Date().toISOString() })
             .eq('id', user.id);
@@ -1177,7 +1178,7 @@ function startRealtimeSync() {
     const tables = ['leads', 'contrats', 'rdv', 'employes', 'candidats', 'pointages', 'agenda', 'notes', 'activites'];
 
     tables.forEach(table => {
-        const channel = supabase
+        const channel = supabaseClient
             .channel('public:' + table)
             .on('postgres_changes', { event: '*', schema: 'public', table: table }, (payload) => {
                 console.log('Realtime update:', table, payload);
@@ -1228,7 +1229,7 @@ async function refreshAllData() {
 
 async function refreshData(table) {
     try {
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
             .from(table)
             .select('*')
             .order('created_at', { ascending: false });
@@ -2013,7 +2014,7 @@ async function insertData(table, data) {
     showLoading('Sauvegarde...');
 
     try {
-        const { data: result, error } = await supabase
+        const { data: result, error } = await supabaseClient
             .from(table)
             .insert([data])
             .select();
@@ -2043,7 +2044,7 @@ async function validerContrat(id, etape) {
     const nextStatut = etape === 'gestion' ? 'manager' : 'it';
 
     try {
-        const { error } = await supabase
+        const { error } = await supabaseClient
             .from('contrats')
             .update({ statut: nextStatut, [etape + '_id']: currentUser.id })
             .eq('id', id);
@@ -2063,13 +2064,13 @@ async function lancerDistributionPoker() {
     showLoading('Distribution Poker...');
 
     try {
-        const { data: commerciaux } = await supabase
+        const { data: commerciaux } = await supabaseClient
             .from('utilisateurs')
             .select('*')
             .eq('role', 'commercial')
             .eq('actif', true);
 
-        const { data: leadsNonAttrib } = await supabase
+        const { data: leadsNonAttrib } = await supabaseClient
             .from('leads')
             .select('*')
             .is('commercial_id', null)
@@ -2083,13 +2084,13 @@ async function lancerDistributionPoker() {
 
         // Algorithme: moins de leads = prochain
         for (const lead of leadsNonAttrib) {
-            const { data: countLeads } = await supabase
+            const { data: countLeads } = await supabaseClient
                 .from('leads')
                 .select('id', { count: 'exact' })
                 .eq('commercial_id', commerciaux[0].id);
 
             // Simplifié: distribuer au premier commercial
-            await supabase
+            await supabaseClient
                 .from('leads')
                 .update({ commercial_id: commerciaux[0].id, statut: 'attribue' })
                 .eq('id', lead.id);
