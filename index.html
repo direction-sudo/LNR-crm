@@ -964,7 +964,7 @@ async function doLogin() {
             .select('*')
             .eq('email', email)
             .eq('actif', true)
-            .single();
+            .maybeSingle();
 
         if (error || !user) {
             showToast('Email ou mot de passe incorrect', 'error');
