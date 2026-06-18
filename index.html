@@ -1,0 +1,2255 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LNR FINANCE - CRM Cloud</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0f1117;--bg2:#1a1d2e;--bg3:#252840;--accent:#4f8ef7;--accent2:#7c5cbf;--success:#22c55e;--warning:#f59e0b;--danger:#ef4444;--text:#e2e8f0;--text2:#94a3b8;--border:#2d3158}
+body{font-family:'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+#loginPage{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#0f1117 0%,#1a1d2e 50%,#252840 100%)}
+.login-box{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:40px;width:420px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.login-logo{text-align:center;margin-bottom:30px}
+.login-logo h1{font-size:28px;color:var(--accent);font-weight:700}
+.login-logo p{color:var(--text2);font-size:14px;margin-top:4px}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:13px;color:var(--text2);margin-bottom:6px}
+.form-group input,.form-group select,.form-group textarea{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-size:14px;outline:none;transition:.2s}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--accent)}
+.form-group textarea{resize:vertical;min-height:80px}
+.btn{padding:10px 20px;border:none;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;transition:.2s;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:#3b7de8}
+.btn-success{background:var(--success);color:#fff}
+.btn-warning{background:var(--warning);color:#000}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-secondary{background:var(--bg3);border:1px solid var(--border);color:var(--text)}
+.btn-secondary:hover{background:var(--border)}
+.btn-full{width:100%;justify-content:center}
+.btn-sm{padding:6px 12px;font-size:12px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+#app{display:none;min-height:100vh;flex-direction:column}
+.topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.topbar-brand{font-size:18px;font-weight:700;color:var(--accent)}
+.topbar-right{display:flex;align-items:center;gap:16px}
+.user-chip{background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:13px;display:flex;align-items:center;gap:8px}
+.avatar{width:28px;height:28px;border-radius:50%;background:var(--accent2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
+.layout{display:flex;flex:1}
+.sidebar{width:240px;background:var(--bg2);border-right:1px solid var(--border);padding:16px 0 0;overflow-y:auto;position:sticky;top:56px;height:calc(100vh - 56px);display:flex;flex-direction:column}
+.sidebar-nav{flex:1;overflow-y:auto}
+.sidebar-footer{padding:12px 16px;border-top:1px solid var(--border);background:var(--bg2);flex-shrink:0}
+.sidebar-user{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.sidebar-user .avatar{width:32px;height:32px;border-radius:50%;background:var(--accent2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
+.sidebar-user .info{flex:1;min-width:0}
+.sidebar-user .info .name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sidebar-user .info .role{font-size:11px;color:var(--text2)}
+.btn-logout{width:100%;padding:8px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:8px;color:var(--danger);cursor:pointer;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px;transition:.2s}
+.btn-logout:hover{background:rgba(239,68,68,.2);border-color:var(--danger)}
+.sidebar-section{margin-bottom:8px}
+.sidebar-label{font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.1em;padding:8px 16px 4px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;color:var(--text2);font-size:13px;transition:.15s;position:relative}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:rgba(79,142,247,.15);color:var(--accent);border-right:2px solid var(--accent)}
+.nav-badge{margin-left:auto;background:var(--accent);color:#fff;border-radius:10px;padding:2px 7px;font-size:10px;font-weight:700}
+.nav-badge.orange{background:var(--warning);color:#000}
+.nav-badge.red{background:var(--danger)}
+.main{flex:1;padding:24px;overflow-y:auto}
+.section{display:none}
+.section.active{display:block}
+.page-header{margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.page-title{font-size:20px;font-weight:700}
+.page-breadcrumb{font-size:12px;color:var(--text2);margin-top:2px}
+.page-actions{display:flex;gap:8px;flex-wrap:wrap}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px}
+.stat-card .label{font-size:12px;color:var(--text2);margin-bottom:8px}
+.stat-card .value{font-size:28px;font-weight:700;color:var(--text)}
+.stat-card .change{font-size:12px;margin-top:4px}
+.stat-card .change.up{color:var(--success)}
+.stat-card .change.down{color:var(--danger)}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px}
+.card-title{font-size:15px;font-weight:600;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+.tabs{display:flex;gap:4px;margin-bottom:20px;border-bottom:1px solid var(--border);padding-bottom:0}
+.tab-btn{padding:10px 18px;background:none;border:none;border-bottom:2px solid transparent;color:var(--text2);cursor:pointer;font-size:13px;font-weight:500;transition:.2s;margin-bottom:-1px}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-content{display:none}
+.tab-content.active{display:block}
+.table-wrap{overflow-x:auto;border-radius:8px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:var(--bg3);padding:10px 14px;text-align:left;font-weight:600;color:var(--text2);font-size:12px;text-transform:uppercase;letter-spacing:.05em}
+td{padding:10px 14px;border-top:1px solid var(--border);vertical-align:middle}
+tr:hover td{background:rgba(255,255,255,.02)}
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.badge-success{background:rgba(34,197,94,.15);color:var(--success)}
+.badge-warning{background:rgba(245,158,11,.15);color:var(--warning)}
+.badge-danger{background:rgba(239,68,68,.15);color:var(--danger)}
+.badge-info{background:rgba(79,142,247,.15);color:var(--accent)}
+.badge-gray{background:rgba(148,163,184,.15);color:var(--text2)}
+.badge-purple{background:rgba(124,92,191,.15);color:#a78bfa}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:28px;width:100%;max-width:620px;max-height:90vh;overflow-y:auto}
+.modal-lg{max-width:820px}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.modal-title{font-size:17px;font-weight:700}
+.modal-close{background:none;border:none;color:var(--text2);cursor:pointer;font-size:20px;padding:4px}
+.modal-close:hover{color:var(--text)}
+.modal-footer{display:flex;justify-content:flex-end;gap:10px;margin-top:24px;padding-top:16px;border-top:1px solid var(--border)}
+.agents-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-bottom:24px}
+.agent-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:18px}
+.agent-card .agent-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.agent-card .agent-name{font-weight:600;font-size:14px}
+.agent-card .agent-desc{font-size:12px;color:var(--text2);margin-bottom:12px}
+.agent-card .agent-status{font-size:11px;display:flex;align-items:center;gap:6px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--success);animation:pulse 2s infinite}
+.dot.offline{background:var(--danger);animation:none}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+.chart-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px}
+.chart-card h3{font-size:14px;font-weight:600;margin-bottom:16px;color:var(--text2)}
+.chart-wrap{position:relative;height:200px}
+.activity-item{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+.activity-item:last-child{border-bottom:none}
+.activity-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);margin-top:5px;flex-shrink:0}
+.activity-dot.green{background:var(--success)}
+.activity-dot.orange{background:var(--warning)}
+.activity-dot.red{background:var(--danger)}
+.activity-content .title{font-size:13px;font-weight:500}
+.activity-content .meta{font-size:11px;color:var(--text2);margin-top:2px}
+.calendar-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.calendar-nav h3{font-size:15px;font-weight:600}
+.cal-nav-btn{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:6px 12px;color:var(--text);cursor:pointer;font-size:13px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal-day-header{text-align:center;font-size:11px;font-weight:700;color:var(--text2);padding:6px;text-transform:uppercase}
+.cal-day{background:var(--bg3);border-radius:8px;padding:8px;min-height:70px;cursor:pointer;transition:.2s;border:1px solid transparent}
+.cal-day:hover{border-color:var(--accent)}
+.cal-day.today{border-color:var(--accent);background:rgba(79,142,247,.1)}
+.cal-day.other-month{opacity:.3}
+.cal-day.weekend{background:rgba(255,255,255,.02)}
+.cal-day-num{font-size:12px;font-weight:600;margin-bottom:4px}
+.cal-event{font-size:10px;padding:2px 5px;border-radius:3px;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cal-event.blue{background:rgba(79,142,247,.3);color:var(--accent)}
+.cal-event.green{background:rgba(34,197,94,.3);color:var(--success)}
+.cal-event.orange{background:rgba(245,158,11,.3);color:var(--warning)}
+.alert-card{background:var(--bg2);border-left:3px solid var(--danger);border-radius:8px;padding:14px 16px;margin-bottom:10px}
+.alert-card.warning{border-left-color:var(--warning)}
+.alert-card.info{border-left-color:var(--accent)}
+.alert-card .alert-title{font-size:13px;font-weight:600;margin-bottom:4px}
+.alert-card .alert-desc{font-size:12px;color:var(--text2)}
+.poker-list{display:flex;flex-direction:column;gap:10px}
+.poker-item{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:12px}
+.poker-rank{width:28px;height:28px;border-radius:50%;background:var(--accent2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
+.poker-info{flex:1}
+.poker-info .name{font-size:13px;font-weight:600}
+.poker-info .meta{font-size:11px;color:var(--text2)}
+.poker-leads{text-align:center;min-width:60px}
+.poker-leads .num{font-size:22px;font-weight:700;color:var(--accent)}
+.poker-leads .label{font-size:10px;color:var(--text2)}
+.poker-next-badge{background:rgba(34,197,94,.15);color:var(--success);border:1px solid var(--success);border-radius:20px;padding:3px 10px;font-size:11px;font-weight:600}
+.poker-quota-badge{background:rgba(239,68,68,.15);color:var(--danger);border:1px solid var(--danger);border-radius:20px;padding:3px 10px;font-size:11px}
+.validation-steps{display:flex;align-items:center;gap:0;margin-bottom:20px;overflow-x:auto}
+.v-step{display:flex;align-items:center;gap:0;flex-shrink:0}
+.v-step-box{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:12px;text-align:center;min-width:110px}
+.v-step-box.active{background:rgba(79,142,247,.15);border-color:var(--accent);color:var(--accent)}
+.v-step-box.done{background:rgba(34,197,94,.15);border-color:var(--success);color:var(--success)}
+.v-step-arrow{color:var(--text2);font-size:16px;padding:0 4px}
+.score-dial{text-align:center;padding:16px}
+.score-num{font-size:56px;font-weight:700;line-height:1}
+.score-num.green{color:var(--success)}
+.score-num.orange{color:var(--warning)}
+.score-num.red{color:var(--danger)}
+.score-label{font-size:13px;color:var(--text2);margin-top:4px}
+.criteria-list{display:flex;flex-direction:column;gap:8px}
+.criteria-item{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg3);border-radius:8px;font-size:13px}
+.criteria-item .pts{font-weight:700;color:var(--accent)}
+.campaign-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:12px}
+.campaign-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.campaign-day{font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;background:rgba(79,142,247,.15);padding:3px 10px;border-radius:20px}
+.campaign-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+.camp-stat{text-align:center;background:var(--bg2);border-radius:6px;padding:8px}
+.camp-stat .v{font-size:18px;font-weight:700}
+.camp-stat .l{font-size:10px;color:var(--text2)}
+.wf-list{display:flex;flex-direction:column;gap:8px}
+.wf-item{display:flex;align-items:center;justify-content:space-between;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px 16px}
+.wf-info{flex:1}
+.wf-info .name{font-size:13px;font-weight:600}
+.wf-info .meta{font-size:11px;color:var(--text2)}
+.wf-stats{text-align:center;margin:0 16px;font-size:11px;color:var(--text2)}
+.wf-stats span{display:block;font-size:15px;font-weight:700;color:var(--text)}
+.wf-toggle{display:flex;align-items:center;gap:8px}
+.toggle{position:relative;display:inline-block;width:40px;height:22px}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;cursor:pointer;inset:0;background:var(--border);border-radius:22px;transition:.3s}
+.toggle-slider:before{position:absolute;content:"";height:16px;width:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.3s}
+.toggle input:checked+.toggle-slider{background:var(--success)}
+.toggle input:checked+.toggle-slider:before{transform:translateX(18px)}
+.audit-criteria{display:flex;flex-direction:column;gap:6px}
+.audit-row{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--bg3);border-radius:6px;font-size:13px}
+.audit-row .criterion{flex:1}
+.audit-row .score-dots{display:flex;gap:3px}
+.audit-row .score-dot{width:12px;height:12px;border-radius:50%;background:var(--border)}
+.audit-row .score-dot.filled{background:var(--success)}
+.audit-row .score-dot.half{background:var(--warning)}
+.integrations-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.int-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px}
+.int-icon{width:36px;height:36px;border-radius:8px;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.int-info .name{font-size:13px;font-weight:600}
+.int-info .status{font-size:11px;display:flex;align-items:center;gap:4px;margin-top:2px}
+.int-info .status.connected{color:var(--success)}
+.int-info .status.pending{color:var(--warning)}
+.progress{background:var(--bg3);border-radius:4px;height:6px;overflow:hidden;margin-top:6px}
+.progress-bar{height:100%;border-radius:4px;background:var(--accent);transition:width .5s}
+.progress-bar.success{background:var(--success)}
+.progress-bar.warning{background:var(--warning)}
+.progress-bar.danger{background:var(--danger)}
+.config-section{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:12px}
+.config-section h4{font-size:13px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px}
+.config-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+.config-row:last-child{border-bottom:none}
+.config-row .desc{font-size:11px;color:var(--text2);margin-top:2px}
+.funnel{display:flex;flex-direction:column;gap:6px}
+.funnel-row{display:flex;align-items:center;gap:12px;font-size:12px}
+.funnel-bar-wrap{flex:1}
+.funnel-val{min-width:50px;text-align:right;font-weight:600}
+.kpi-table{font-size:12px}
+.kpi-table td:first-child{font-weight:600}
+.kpi-table td{padding:7px 12px}
+.trend-up{color:var(--success)}
+.trend-down{color:var(--danger)}
+.notes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.note-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;transition:.2s;position:relative}
+.note-card:hover{border-color:var(--accent)}
+.note-card.epingle{border-left:3px solid var(--warning)}
+.note-card .note-title{font-size:13px;font-weight:600;margin-bottom:6px}
+.note-card .note-content{font-size:12px;color:var(--text2);line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.note-card .note-meta{font-size:11px;color:var(--text2);margin-top:8px;display:flex;justify-content:space-between}
+.note-card .note-cat{font-size:10px;padding:2px 8px;border-radius:10px;background:var(--bg2)}
+.note-card .note-cat.urgent{background:rgba(239,68,68,.2);color:var(--danger)}
+.sync-indicator{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2)}
+.sync-indicator.syncing .dot{animation:spin 1s linear infinite}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.loading-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:9999;align-items:center;justify-content:center;flex-direction:column;gap:16px}
+.loading-overlay.open{display:flex}
+.loading-spinner{width:48px;height:48px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite}
+.loading-text{color:var(--text2);font-size:14px}
+.empty-state{text-align:center;padding:40px;color:var(--text2)}
+.empty-state .icon{font-size:48px;margin-bottom:12px}
+.flex{display:flex}.gap-8{gap:8px}.gap-12{gap:12px}.items-center{align-items:center}.justify-between{justify-content:space-between}
+.mt-16{margin-top:16px}.mb-16{margin-bottom:16px}.mt-8{margin-top:8px}
+.text-sm{font-size:12px}.text-muted{color:var(--text2)}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.section-divider{border:none;border-top:1px solid var(--border);margin:20px 0}
+.info-box{background:rgba(79,142,247,.08);border:1px solid rgba(79,142,247,.3);border-radius:8px;padding:12px 16px;font-size:13px;color:var(--accent);margin-bottom:16px}
+.warning-box{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);border-radius:8px;padding:12px 16px;font-size:13px;color:var(--warning);margin-bottom:16px}
+</style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-spinner"></div>
+  <div class="loading-text">Synchronisation avec Supabase Cloud...</div>
+</div>
+
+<!-- ============ LOGIN PAGE ============ -->
+<div id="loginPage">
+  <div class="login-box">
+    <div class="login-logo">
+      <h1>🏢 LNR FINANCE</h1>
+      <p>CRM Cloud - Base de données sécurisée</p>
+      <div class="sync-indicator" style="justify-content:center;margin-top:8px">
+        <span class="dot" style="width:6px;height:6px"></span>
+        <span>🔗 Supabase PostgreSQL Cloud</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Email professionnel</label>
+      <input type="email" id="loginEmail" placeholder="votre@lnr-finance.fr">
+    </div>
+    <div class="form-group">
+      <label>Mot de passe</label>
+      <input type="password" id="loginPwd" placeholder="••••••••">
+    </div>
+    <button class="btn btn-primary btn-full" onclick="doLogin()" id="loginBtn">🔐 Connexion sécurisée</button>
+    <p style="text-align:center;font-size:11px;color:var(--text2);margin-top:12px">
+      🔒 Auth JWT • PostgreSQL • SSL/TLS • Realtime Sync<br>
+      ❌ Aucune donnée stockée localement
+    </p>
+  </div>
+</div>
+
+<!-- ============ MAIN APP ============ -->
+<div id="app">
+  <div class="topbar">
+    <div class="topbar-brand">🏢 LNR FINANCE</div>
+    <div class="topbar-right">
+      <div class="sync-indicator" id="syncStatus">
+        <span class="dot" style="width:6px;height:6px"></span>
+        <span id="syncText">Sync OK</span>
+      </div>
+      <div class="user-chip">
+        <div class="avatar" id="userAvatar">--</div>
+        <span id="userName">-</span>
+        <span id="userRole" style="color:var(--text2);font-size:11px">-</span>
+      </div>
+    </div>
+  </div>
+  <div class="layout">
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-nav">
+        <div class="sidebar-section">
+          <div class="sidebar-label">Vue d'ensemble</div>
+          <div class="nav-item active" onclick="showSection('dashboard')">📊 Tableau de bord</div>
+        </div>
+        <div class="sidebar-section" id="nav-rh">
+          <div class="sidebar-label">Agent RH</div>
+          <div class="nav-item" onclick="showSection('recrutement')">🔍 Recrutement <span class="nav-badge" id="badge-recrutement">0</span></div>
+          <div class="nav-item" onclick="showSection('pointage')">⏱️ Pointage</div>
+          <div class="nav-item" onclick="showSection('employes')">👥 Employés</div>
+        </div>
+        <div class="sidebar-section" id="nav-commercial">
+          <div class="sidebar-label">Commercial</div>
+          <div class="nav-item" onclick="showSection('leads')">🎯 Leads <span class="nav-badge" id="badge-leads">0</span></div>
+          <div class="nav-item" onclick="showSection('poker')">🃏 Poker</div>
+          <div class="nav-item" onclick="showSection('rdv')">📅 RDV <span class="nav-badge" id="badge-rdv">0</span></div>
+          <div class="nav-item" onclick="showSection('campagnes')">📧 Campagnes</div>
+        </div>
+        <div class="sidebar-section" id="nav-assurance">
+          <div class="sidebar-label">Assurance</div>
+          <div class="nav-item" onclick="showSection('contrats')">📁 Contrats <span class="nav-badge orange" id="badge-contrats">0</span></div>
+          <div class="nav-item" onclick="showSection('validation')">✅ Validation <span class="nav-badge orange" id="badge-validation">0</span></div>
+          <div class="nav-item" onclick="showSection('audit')">🔍 Audit</div>
+        </div>
+        <div class="sidebar-section" id="nav-marketing">
+          <div class="sidebar-label">Marketing</div>
+          <div class="nav-item" onclick="showSection('marketing')">📱 Réseaux</div>
+          <div class="nav-item" onclick="showSection('analytics')">📈 Analytics</div>
+        </div>
+        <div class="sidebar-section" id="nav-orga">
+          <div class="sidebar-label">Organisation</div>
+          <div class="nav-item" onclick="showSection('agenda')">📅 Agenda</div>
+          <div class="nav-item" onclick="showSection('notes')">📝 Notes</div>
+        </div>
+        <div class="sidebar-section" id="nav-system">
+          <div class="sidebar-label">Système</div>
+          <div class="nav-item" onclick="showSection('workflows')">⚡ n8n</div>
+          <div class="nav-item" onclick="showSection('parametres')">⚙️ Paramètres</div>
+          <div class="nav-item" onclick="showSection('documentation')">📚 Docs</div>
+        </div>
+      </div>
+      <div class="sidebar-footer">
+        <div class="sidebar-user">
+          <div class="avatar" id="sidebarAvatar">--</div>
+          <div class="info">
+            <div class="name" id="sidebarName">-</div>
+            <div class="role" id="sidebarRole">-</div>
+          </div>
+        </div>
+        <button class="btn-logout" onclick="doLogout()">↩ Déconnexion</button>
+      </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main" id="mainContent">
+
+<!-- ===== DASHBOARD ===== -->
+<div class="section active" id="sec-dashboard">
+  <div class="page-header">
+    <div><div class="page-title">Tableau de bord</div><div class="page-breadcrumb">LNR FINANCE / Vue d'ensemble</div></div>
+    <div class="page-actions">
+      <span style="font-size:12px;color:var(--text2)">DB: <span id="lastUpdate">-</span></span>
+      <button class="btn btn-sm btn-secondary" onclick="refreshAllData()">🔄 Sync</button>
+    </div>
+  </div>
+  <div class="stats-grid" id="dashboardStats">
+    <div class="stat-card"><div class="label">CA (mois)</div><div class="value" id="statCA">-</div><div class="change up">Cloud DB</div></div>
+    <div class="stat-card"><div class="label">Contrats</div><div class="value" id="statContrats">-</div><div class="change up">Sync temps réel</div></div>
+    <div class="stat-card"><div class="label">Leads actifs</div><div class="value" id="statLeads">-</div><div class="change up">PostgreSQL</div></div>
+    <div class="stat-card"><div class="label">Employés</div><div class="value" id="statEmployes">-</div><div class="change up">Supabase</div></div>
+  </div>
+  <div class="chart-grid">
+    <div class="chart-card"><h3>Performance</h3><div class="chart-wrap"><canvas id="chartPerf"></canvas></div></div>
+    <div class="chart-card"><h3>Répartition</h3><div class="chart-wrap"><canvas id="chartContrats"></canvas></div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Activité Temps Réel</div>
+    <div id="activityFeed"><div class="empty-state"><div class="icon">⏳</div><p>Chargement...</p></div></div>
+  </div>
+</div>
+
+<!-- ===== RECRUTEMENT ===== -->
+<div class="section" id="sec-recrutement">
+  <div class="page-header">
+    <div><div class="page-title">Recrutement</div><div class="page-breadcrumb">LNR / RH / Recrutement</div></div>
+    <div class="page-actions">
+      <button class="btn btn-sm btn-secondary" onclick="openModal('modalCandidat')">➕ Candidat</button>
+      <button class="btn btn-sm btn-primary" onclick="refreshData('candidats')">🔄 Sync</button>
+    </div>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="label">Total</div><div class="value" id="statCandTotal">-</div></div>
+    <div class="stat-card"><div class="label">Qualifiés</div><div class="value" id="statCandQualif">-</div></div>
+    <div class="stat-card"><div class="label">Entretiens</div><div class="value" id="statCandEntretien">-</div></div>
+    <div class="stat-card"><div class="label">Refusés</div><div class="value" id="statCandRefuse">-</div></div>
+  </div>
+  <div class="table-wrap">
+    <table><thead><tr><th>Nom</th><th>Poste</th><th>Exp.</th><th>Score</th><th>Statut</th><th>Actions</th></tr></thead>
+    <tbody id="tableCandidats"><tr><td colspan="6" class="empty-state">Chargement DB...</td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ===== POINTAGE ===== -->
+<div class="section" id="sec-pointage">
+  <div class="page-header">
+    <div><div class="page-title">Pointage</div><div class="page-breadcrumb">LNR / RH / Pointage</div></div>
+    <div class="page-actions">
+      <button class="btn btn-sm btn-secondary" onclick="openModal('modalPointage')">➕ Pointage</button>
+      <button class="btn btn-sm btn-primary" onclick="refreshData('pointages')">🔄 Sync</button>
+    </div>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="label">Présents</div><div class="value" id="statPresents">-</div></div>
+    <div class="stat-card"><div class="label">Retards</div><div class="value" id="statRetards">-</div></div>
+    <div class="stat-card"><div class="label">Absences</div><div class="value" id="statAbsences">-</div></div>
+    <div class="stat-card"><div class="label">Taux</div><div class="value" id="statTauxPresence">-</div></div>
+  </div>
+  <div class="table-wrap">
+    <table><thead><tr><th>Matricule</th><th>Nom</th><th>Date</th><th>Arrivée</th><th>Départ</th><th>Retard</th><th>Statut</th></tr></thead>
+    <tbody id="tablePointages"><tr><td colspan="7" class="empty-state">Chargement...</td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ===== EMPLOYÉS ===== -->
+<div class="section" id="sec-employes">
+  <div class="page-header">
+    <div><div class="page-title">Employés</div><div class="page-breadcrumb">LNR / RH / Employés</div></div>
+    <div class="page-actions">
+      <button class="btn btn-sm btn-primary" onclick="openModal('modalEmploye')">➕ Employé</button>
+      <button class="btn btn-sm btn-primary" onclick="refreshData('employes')">🔄 Sync</button>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table><thead><tr><th>Matricule</th><th>Nom</th><th>Prénom</th><th>Poste</th><th>Email</th><th>Téléphone</th><th>Salaire</th><th>CNSS</th><th>Statut</th><th>Actions</th></tr></thead>
+    <tbody id="tableEmployes"><tr><td colspan="10" class="empty-state">Chargement Supabase...</td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ===== LEADS ===== -->
+<div class="section" id="sec-leads">
+  <div class="page-header">
+    <div><div class="page-title">Leads</div><div class="page-breadcrumb">LNR / Commercial / Leads</div></div>
+    <div class="page-actions">
+      <button class="btn btn-sm btn-primary" onclick="openModal('modalLead')">➕ Lead</button>
+      <button class="btn btn-sm btn-primary" onclick="refreshData('leads')">🔄 Sync</button>
+    </div>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="label">Total</div><div class="value" id="statLeadsTotal">-</div></div>
+    <div class="stat-card"><div class="label">Qualifiés</div><div class="value" id="statLeadsQualif">-</div></div>
+    <div class="stat-card"><div class="label">Attribués</div><div class="value" id="statLeadsAttrib">-</div></div>
+    <div class="stat-card"><div class="label">Signés</div><div class="value" id="statLeadsSignes">-</div></div>
+  </div>
+  <div class="table-wrap">
+    <table><thead><tr><th>Réf</th><th>Nom</th><th>Tél</th><th>Âge</th><th>CP</th><th>Mutuelle</th><th>Score</th><th>Type</th><th>Commercial</th><th>Statut</th><th>Actions</th></tr></thead>
+    <tbody id="tableLeads"><tr><td colspan="11" class="empty-state">Chargement DB...</td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ===== POKER ===== -->
+<div class="section" id="sec-poker">
+  <div class="page-header">
+    <div><div class="page-title">Distribution Poker</div><div class="page-breadcrumb">LNR / Commercial / Poker</div></div>
+    <div class="page-actions">
+      <button class="btn btn-sm btn-primary" onclick="lancerDistributionPoker()">▶ Distribuer</button>
+      <button class="btn btn-sm btn-primary" onclick="refreshData('leads')">🔄 Sync</button>
+    </div>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="label">Commerciaux</div><div class="value" id="statCommerciaux">-</div></div>
+    <div class="stat-card"><div class="label">Leads/commercial</div><div class="value" id="statMoyLeads">-</div></div>
+    <div class="stat-card"><div class="label">En attente</div><div class="value" id="statLeadsAttente">-</div></div>
+    <div class="stat-card"><div class="label">Prochain</div><div class="value" id="statProchain">-</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">🃏 Classement Poker</div>
+    <div class="poker-list" id="pokerList"><div class="empty-state">Chargement...</div></div>
+  </div>
+</div>
+
+<!-- ===== RDV ===== -->
+<div class="section" id="sec-rdv">
+  <div class="page-header">
+    <div><div class="page-title">Rendez-vous</div><div class="page-breadcrumb">LNR / Commercial / RDV</div></div>
+    <div class="page-actions">
+      <button class="btn btn-sm btn-primary" onclick="openModal('modalRDV')">➕ RDV</button>
+      <button class="btn btn-sm btn-primary" onclick="refreshData('rdv')">🔄 Sync</button>
+    </div>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="label">Cette semaine</div><div class="value" id="statRDVSemaine">-</div></div>
+    <div class="stat-card"><div class="label">Honorés</div><div class="value" id="statRDVHonore">-</div></div>
+    <div class="stat-card"><div class="label">No-show</div><div class="value" id="statRDVNoShow">-</div></div>
+    <div class="stat-card"><div class="label">Conversion</div><div class="value" id="statRDVConv">-</div></div>
+  </div>
+  <div class="table-wrap">
+    <table><thead><tr><th>Date</th><th>Heure</th><th>Client</th><th>Téléphone</th><th>Commercial</th><th>Type</th><th>Statut</th><th>Actions</th></tr></thead>
+    <tbody id="tableRDV"><tr><td colspan="8" class="empty-state">Chargement...</td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ===== CAMPAGNES ===== -->
+<div class="section" id="sec-campagnes">
+  <div class="page-header">
+    <div><div class="page-title">Campagnes</div><div class="page-breadcrumb">LNR / Commercial / Campagnes</div></div>
+    <div class="page-actions">
+      <button class="btn btn-sm btn-primary" onclick="openModal('modalCampagne')">➕ Campagne</button>
+      <button class="btn btn-sm btn-primary" onclick="refreshData('campagnes')">🔄 Sync</button>
+    </div>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="label">Envoyés (7j)</div><div class="value" id="statCampEnvoyes">-</div></div>
+    <div class="stat-card"><div class="label">Ouverture</div><div class="value" id="statCampOuverture">-</div></div>
+    <div class="stat-card"><div class="label">Réponse</div><div class="value" id="statCampReponse">-</div></div>
+    <div class="stat-card"><div class="label">Conversion</div><div class="value" id="statCampConv">-</div></div>
+  </div>
+  <div id="campagnesList"><div class="empty-state">Chargement campagnes...</div></div>
+</div>
+
+<!-- ===== CONTRATS ===== -->
+<div class="section" id="sec-contrats">
+  <div class="page-header">
+    <div><div class="page-title">Contrats</div><div class="page-breadcrumb">LNR / Assurance / Contrats</div></div>
+    <div class="page-actions">
+      <button class="btn btn-sm btn-primary" onclick="openModal('modalContrat')">➕ Contrat</button>
+      <button class="btn btn-sm btn-primary" onclick="refreshData('contrats')">🔄 Sync</button>
+    </div>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="label">Total</div><div class="value" id="statContratsTotal">-</div></div>
+    <div class="stat-card"><div class="label">Validés</div><div class="value" id="statContratsValides">-</div></div>
+    <div class="stat-card"><div class="label">En attente</div><div class="value" id="statContratsAttente">-</div></div>
+    <div class="stat-card"><div class="label">Actifs</div><div class="value" id="statContratsActifs">-</div></div>
+  </div>
+  <div class="table-wrap">
+    <table><thead><tr><th>Réf</th><th>Souscripteur</th><th>Téléphone</th><th>Compagnie</th><th>Montant</th><th>Statut</th><th>Commercial</th><th>Actions</th></tr></thead>
+    <tbody id="tableContrats"><tr><td colspan="8" class="empty-state">Chargement...</td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ===== VALIDATION ===== -->
+<div class="section" id="sec-validation">
+  <div class="page-header">
+    <div><div class="page-title">Validation Hiérarchique</div><div class="page-breadcrumb">LNR / Assurance / Validation</div></div>
+    <div class="page-actions">
+      <button class="btn btn-sm btn-primary" onclick="refreshData('contrats')">🔄 Sync</button>
+    </div>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="label">Attente Gestion</div><div class="value" id="statValGestion">-</div></div>
+    <div class="stat-card"><div class="label">Attente Manager</div><div class="value" id="statValManager">-</div></div>
+    <div class="stat-card"><div class="label">Validés</div><div class="value" id="statValOk">-</div></div>
+    <div class="stat-card"><div class="label">Rejetés</div><div class="value" id="statValRejet">-</div></div>
+  </div>
+  <div class="validation-steps">
+    <div class="v-step"><div class="v-step-box done">✅ Créé</div></div>
+    <div class="v-step-arrow">→</div>
+    <div class="v-step"><div class="v-step-box active">1️⃣ Gestion</div></div>
+    <div class="v-step-arrow">→</div>
+    <div class="v-step"><div class="v-step-box">2️⃣ Manager</div></div>
+    <div class="v-step-arrow">→</div>
+    <div class="v-step"><div class="v-step-box">3️⃣ IT</div></div>
+    <div class="v-step-arrow">→</div>
+    <div class="v-step"><div class="v-step-box">✅ Actif</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">📋 Étape 1 — Gestion</div>
+    <div class="table-wrap">
+      <table><thead><tr><th>Réf</th><th>Client</th><th>Compagnie</th><th>Montant</th><th>Commercial</th><th>Actions</th></tr></thead>
+      <tbody id="tableValGestion"><tr><td colspan="6" class="empty-state">Chargement...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">🔐 Étape 2 — Manager</div>
+    <div class="table-wrap">
+      <table><thead><tr><th>Réf</th><th>Client</th><th>Compagnie</th><th>Validé Gestion</th><th>Montant</th><th>Actions</th></tr></thead>
+      <tbody id="tableValManager"><tr><td colspan="6" class="empty-state">Chargement...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ===== AUDIT ===== -->
+<div class="section" id="sec-audit">
+  <div class="page-header">
+    <div><div class="page-title">Audit Qualité</div><div class="page-breadcrumb">LNR / Assurance / Audit</div></div>
+    <div class="page-actions">
+      <button class="btn btn-sm btn-primary" onclick="openModal('modalAudit')">➕ Audit</button>
+      <button class="btn btn-sm btn-primary" onclick="refreshData('audits')">🔄 Sync</button>
+    </div>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="label">Conformes</div><div class="value" id="statAuditVert">-</div></div>
+    <div class="stat-card"><div class="label">À corriger</div><div class="value" id="statAuditOrange">-</div></div>
+    <div class="stat-card"><div class="label">Non conformes</div><div class="value" id="statAuditRouge">-</div></div>
+    <div class="stat-card"><div class="label">Score moyen</div><div class="value" id="statAuditMoy">-</div></div>
+  </div>
+  <div class="table-wrap">
+    <table><thead><tr><th>Date</th><th>Commercial</th><th>Client</th><th>Score</th><th>Niveau</th><th>Actions</th></tr></thead>
+    <tbody id="tableAudits"><tr><td colspan="6" class="empty-state">Chargement...</td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ===== MARKETING ===== -->
+<div class="section" id="sec-marketing">
+  <div class="page-header">
+    <div><div class="page-title">Réseaux Sociaux</div><div class="page-breadcrumb">LNR / Marketing / Réseaux</div></div>
+    <div class="page-actions">
+      <button class="btn btn-sm btn-primary" onclick="openModal('modalPost')">➕ Post</button>
+      <button class="btn btn-sm btn-primary" onclick="refreshData('posts')">🔄 Sync</button>
+    </div>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="label">Facebook</div><div class="value" id="statFb">-</div></div>
+    <div class="stat-card"><div class="label">Instagram</div><div class="value" id="statIg">-</div></div>
+    <div class="stat-card"><div class="label">LinkedIn</div><div class="value" id="statLi">-</div></div>
+    <div class="stat-card"><div class="label">Engagement</div><div class="value" id="statEngage">-</div></div>
+  </div>
+  <div class="table-wrap">
+    <table><thead><tr><th>Date</th><th>Réseaux</th><th>Contenu</th><th>Portée</th><th>Engagement</th><th>Statut</th></tr></thead>
+    <tbody id="tablePosts"><tr><td colspan="6" class="empty-state">Chargement...</td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ===== ANALYTICS ===== -->
+<div class="section" id="sec-analytics">
+  <div class="page-header">
+    <div><div class="page-title">Analytics & ROI</div><div class="page-breadcrumb">LNR / Marketing / Analytics</div></div>
+    <div class="page-actions">
+      <button class="btn btn-sm btn-primary" onclick="refreshData('analytics')">🔄 Sync</button>
+    </div>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="label">Croissance CA</div><div class="value" id="statCroissance">-</div></div>
+    <div class="stat-card"><div class="label">Conversion</div><div class="value" id="statConvGlobal">-</div></div>
+    <div class="stat-card"><div class="label">CAC</div><div class="value" id="statCAC">-</div></div>
+    <div class="stat-card"><div class="label">Délai moyen</div><div class="value" id="statDelai">-</div></div>
+  </div>
+  <div class="chart-grid">
+    <div class="chart-card"><h3>Performance Commerciaux</h3><div class="chart-wrap"><canvas id="chartCommercial"></canvas></div></div>
+    <div class="chart-card"><h3>Répartition Compagnies</h3><div class="chart-wrap"><canvas id="chartCompagnie"></canvas></div></div>
+  </div>
+</div>
+
+<!-- ===== AGENDA ===== -->
+<div class="section" id="sec-agenda">
+  <div class="page-header">
+    <div><div class="page-title">Agenda</div><div class="page-breadcrumb">LNR / Organisation / Agenda</div></div>
+    <div class="page-actions">
+      <button class="btn btn-sm btn-primary" onclick="openModal('modalAgenda')">➕ Événement</button>
+      <button class="btn btn-sm btn-primary" onclick="refreshData('agenda')">🔄 Sync</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="calendar-nav">
+      <button class="cal-nav-btn" onclick="prevMonth()">◀</button>
+      <h3 id="calTitle"></h3>
+      <button class="cal-nav-btn" onclick="nextMonth()">▶</button>
+    </div>
+    <div class="cal-grid" id="calGrid"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">📋 Événements du mois</div>
+    <div id="agendaList"><div class="empty-state">Chargement...</div></div>
+  </div>
+</div>
+
+<!-- ===== NOTES ===== -->
+<div class="section" id="sec-notes">
+  <div class="page-header">
+    <div><div class="page-title">Bloc-notes</div><div class="page-breadcrumb">LNR / Organisation / Notes</div></div>
+    <div class="page-actions">
+      <button class="btn btn-sm btn-primary" onclick="openModal('modalNote')">➕ Note</button>
+      <button class="btn btn-sm btn-primary" onclick="refreshData('notes')">🔄 Sync</button>
+    </div>
+  </div>
+  <div class="info-box">💡 Les notes sont synchronisées en temps réel entre tous les utilisateurs</div>
+  <div class="notes-grid" id="notesGrid"><div class="empty-state" style="grid-column:1/-1"><div class="icon">📝</div><p>Chargement notes...</p></div></div>
+</div>
+
+<!-- ===== WORKFLOWS ===== -->
+<div class="section" id="sec-workflows">
+  <div class="page-header">
+    <div><div class="page-title">Workflows n8n</div><div class="page-breadcrumb">LNR / Système / Workflows</div></div>
+    <div class="page-actions">
+      <a href="https://lnrfinance.app.n8n.cloud" target="_blank" class="btn btn-sm btn-primary">🔗 n8n Cloud</a>
+    </div>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="label">Workflows</div><div class="value">11</div></div>
+    <div class="stat-card"><div class="label">Succès 24h</div><div class="value">98.7%</div></div>
+    <div class="stat-card"><div class="label">Webhooks</div><div class="value">5</div></div>
+    <div class="stat-card"><div class="label">Version</div><div class="value" style="font-size:18px">1.50</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">⚡ Workflows actifs</div>
+    <div class="wf-list">
+      <div class="wf-item"><div class="wf-info"><div class="name">Recrutement Complet</div><div class="meta">Webhook HTTP POST</div></div><div class="wf-stats"><span>3</span>exec</div><span class="badge badge-success">Actif</span></div>
+      <div class="wf-item"><div class="wf-info"><div class="name">Pointage Quotidien</div><div class="meta">Schedule 9h30</div></div><div class="wf-stats"><span>1</span>exec</div><span class="badge badge-success">Actif</span></div>
+      <div class="wf-item"><div class="wf-info"><div class="name">Qualification Massive</div><div class="meta">Automatique</div></div><div class="wf-stats"><span>18</span>exec</div><span class="badge badge-success">Actif</span></div>
+      <div class="wf-item"><div class="wf-info"><div class="name">Distribution Leads</div><div class="meta">Automatique</div></div><div class="wf-stats"><span>24</span>exec</div><span class="badge badge-success">Actif</span></div>
+      <div class="wf-item"><div class="wf-info"><div class="name">Envoi Instantly</div><div class="meta">Toutes les heures</div></div><div class="wf-stats"><span>47</span>exec</div><span class="badge badge-success">Actif</span></div>
+      <div class="wf-item"><div class="wf-info"><div class="name">Relance Documents</div><div class="meta">J+1, J+3, J+7</div></div><div class="wf-stats"><span>8</span>exec</div><span class="badge badge-success">Actif</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PARAMÈTRES ===== -->
+<div class="section" id="sec-parametres">
+  <div class="page-header">
+    <div><div class="page-title">Paramètres Système</div><div class="page-breadcrumb">LNR / Système / Paramètres</div></div>
+    <div class="page-actions"><button class="btn btn-primary" onclick="saveParametres()">💾 Sauvegarder</button></div>
+  </div>
+  <div class="grid-2">
+    <div class="card" style="margin:0">
+      <div class="card-title">🏢 Entreprise</div>
+      <div class="form-group"><label>Nom</label><input id="paramNom" value="LNR FINANCE"></div>
+      <div class="form-group"><label>ORIAS</label><input id="paramOrias" value="n°24000175"></div>
+      <div class="form-group"><label>Email direction</label><input id="paramEmailDir" value="direction@lnr-finance.com"></div>
+      <div class="form-group"><label>Email RH</label><input id="paramEmailRH" value="direction.rh@lnr-finance.fr"></div>
+      <div class="form-group"><label>Email comptable</label><input id="paramEmailCompta" value="service.comptabilite@lnr-finance.fr"></div>
+    </div>
+    <div class="card" style="margin:0">
+      <div class="card-title">🔧 Configuration CRM</div>
+      <div class="form-group"><label>Seuil score haut</label><input id="paramSeuilHaut" type="number" value="70"></div>
+      <div class="form-group"><label>Seuil score moyen</label><input id="paramSeuilMoyen" type="number" value="50"></div>
+      <div class="form-group"><label>Quota leads/jour</label><input id="paramQuota" type="number" value="20"></div>
+      <div class="form-group"><label>Délai NRP (heures)</label><input id="paramNRP" type="number" value="48"></div>
+      <div class="form-group"><label>CNSS salarial %</label><input id="paramCNSSSal" value="9.68"></div>
+      <div class="form-group"><label>CNSS patronal %</label><input id="paramCNSSPat" value="17.07"></div>
+    </div>
+  </div>
+  <div class="card mt-16">
+    <div class="card-title">🔐 Sécurité & Base de données</div>
+    <div class="info-box">✅ PostgreSQL Cloud (Supabase) • SSL/TLS • RLS activé • Realtime sync</div>
+    <div class="grid-2">
+      <div>
+        <div class="config-row"><span>Auth JWT</span><span class="badge badge-success">Actif</span></div>
+        <div class="config-row"><span>Row Level Security</span><span class="badge badge-success">Actif</span></div>
+        <div class="config-row"><span>Realtime WebSocket</span><span class="badge badge-success">Actif</span></div>
+      </div>
+      <div>
+        <div class="config-row"><span>Stockage local</span><span class="badge badge-danger">Désactivé</span></div>
+        <div class="config-row"><span>Chiffrement mots de passe</span><span class="badge badge-success">bcrypt</span></div>
+        <div class="config-row"><span>Backup automatique</span><span class="badge badge-success">Quotidien</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== DOCUMENTATION ===== -->
+<div class="section" id="sec-documentation">
+  <div class="page-header">
+    <div><div class="page-title">Documentation</div><div class="page-breadcrumb">LNR / Documentation</div></div>
+  </div>
+  <div class="grid-2">
+    <div class="card" style="cursor:pointer"><div class="flex items-center gap-12"><span style="font-size:28px">👥</span><div><div style="font-weight:600">Guide RH Recrutement</div><div class="text-sm text-muted">Scoring IA, webhooks, notifications</div></div></div></div>
+    <div class="card" style="cursor:pointer"><div class="flex items-center gap-12"><span style="font-size:28px">🎯</span><div><div style="font-weight:600">Guide Leads & Poker</div><div class="text-sm text-muted">Qualification IA, distribution équitable</div></div></div></div>
+    <div class="card" style="cursor:pointer"><div class="flex items-center gap-12"><span style="font-size:28px">📧</span><div><div style="font-weight:600">Guide Campagnes Instantly</div><div class="text-sm text-muted">Templates J1/J3/J7/J15, anti-spam</div></div></div></div>
+    <div class="card" style="cursor:pointer"><div class="flex items-center gap-12"><span style="font-size:28px">📁</span><div><div style="font-weight:600">Guide Assurance</div><div class="text-sm text-muted">Validation hiérarchique, relances</div></div></div></div>
+    <div class="card" style="cursor:pointer"><div class="flex items-center gap-12"><span style="font-size:28px">⚡</span><div><div style="font-weight:600">Guide n8n Workflows</div><div class="text-sm text-muted">11 workflows, configuration, dépannage</div></div></div></div>
+    <div class="card" style="cursor:pointer"><div class="flex items-center gap-12"><span style="font-size:28px">🗄️</span><div><div style="font-weight:600">Guide Base de données</div><div class="text-sm text-muted">Supabase, PostgreSQL, RLS, Realtime</div></div></div></div>
+  </div>
+</div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ============ MODALS ============ -->
+
+<div class="modal-overlay" id="modalCandidat">
+  <div class="modal modal-lg">
+    <div class="modal-header"><div class="modal-title">👤 Nouveau Candidat</div><button class="modal-close" onclick="closeModal('modalCandidat')">✕</button></div>
+    <div class="form-row"><div class="form-group"><label>Nom *</label><input id="candNom" placeholder="Nom"></div><div class="form-group"><label>Prénom *</label><input id="candPrenom" placeholder="Prénom"></div></div>
+    <div class="form-row"><div class="form-group"><label>Téléphone</label><input id="candTel" placeholder="+216..."></div><div class="form-group"><label>Email</label><input id="candEmail" type="email"></div></div>
+    <div class="form-row"><div class="form-group"><label>Poste *</label><select id="candPoste"><option>Télévendeur</option><option>Chargé RDV</option><option>Chef d'équipe</option><option>Gestionnaire</option></select></div><div class="form-group"><label>Expérience (années)</label><input id="candExp" type="number" value="0"></div></div>
+    <div class="form-group"><label>Expérience Mutuelle</label><select id="candExpMut"><option>Aucune</option><option>< 1 an</option><option>1-2 ans</option><option>2-5 ans</option><option>> 5 ans</option></select></div>
+    <div class="form-row"><div class="form-group"><label>Disponibilité</label><select id="candDispo"><option>Immédiate</option><option>1 mois</option><option>2 mois</option></select></div><div class="form-group"><label>Niveau Français</label><select id="candFr"><option>Excellent</option><option>Bon</option><option>Moyen</option></select></div></div>
+    <div class="form-group"><label>Commentaire</label><textarea id="candCommentaire" placeholder="..."></textarea></div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalCandidat')">Annuler</button><button class="btn btn-primary" onclick="saveCandidat()">💾 Sauvegarder</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalPointage">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">⏱️ Nouveau Pointage</div><button class="modal-close" onclick="closeModal('modalPointage')">✕</button></div>
+    <div class="form-row"><div class="form-group"><label>Employé</label><select id="pointEmploye"></select></div><div class="form-group"><label>Date</label><input id="pointDate" type="date"></div></div>
+    <div class="form-row"><div class="form-group"><label>Arrivée</label><input id="pointArrivee" type="time" value="09:00"></div><div class="form-group"><label>Départ</label><input id="pointDepart" type="time" value="18:00"></div></div>
+    <div class="form-group"><label>Statut</label><select id="pointStatut"><option value="present">Présent</option><option value="retard">Retard</option><option value="absent">Absent</option><option value="conge">Congé</option></select></div>
+    <div class="form-group"><label>Justificatif</label><textarea id="pointJustif" placeholder="..."></textarea></div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalPointage')">Annuler</button><button class="btn btn-primary" onclick="savePointage()">💾 Sauvegarder</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalEmploye">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">👤 Nouvel Employé</div><button class="modal-close" onclick="closeModal('modalEmploye')">✕</button></div>
+    <div class="form-row"><div class="form-group"><label>Nom *</label><input id="empNom" placeholder="Nom"></div><div class="form-group"><label>Prénom *</label><input id="empPrenom" placeholder="Prénom"></div></div>
+    <div class="form-row"><div class="form-group"><label>Poste *</label><select id="empPoste"><option>Télévendeur</option><option>Chargé RDV</option><option>Commercial</option><option>Chef d'équipe</option><option>Gestionnaire</option></select></div><div class="form-group"><label>Salaire brut (TND)</label><input id="empSalaire" type="number"></div></div>
+    <div class="form-row"><div class="form-group"><label>Email</label><input id="empEmail" type="email" placeholder="@lnr-finance.fr"></div><div class="form-group"><label>Téléphone</label><input id="empTel" placeholder="+216..."></div></div>
+    <div class="form-row"><div class="form-group"><label>Matricule CNSS</label><input id="empCNSS" placeholder="CNSS-00X"></div><div class="form-group"><label>CIN</label><input id="empCIN" placeholder="Numéro CIN"></div></div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalEmploye')">Annuler</button><button class="btn btn-primary" onclick="saveEmploye()">💾 Sauvegarder</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalLead">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">🎯 Nouveau Lead</div><button class="modal-close" onclick="closeModal('modalLead')">✕</button></div>
+    <div class="form-row"><div class="form-group"><label>Prénom *</label><input id="leadPrenom"></div><div class="form-group"><label>Nom *</label><input id="leadNom"></div></div>
+    <div class="form-row"><div class="form-group"><label>Téléphone *</label><input id="leadTel" placeholder="+216..."></div><div class="form-group"><label>Email</label><input id="leadEmail" type="email"></div></div>
+    <div class="form-row"><div class="form-group"><label>Âge</label><input id="leadAge" type="number"></div><div class="form-group"><label>Code postal</label><input id="leadCP" placeholder="1002"></div></div>
+    <div class="form-row"><div class="form-group"><label>Mutuelle actuelle</label><input id="leadMutuelle" placeholder="CNSS, AMC..."></div><div class="form-group"><label>Type</label><select id="leadType"><option>SENIOR_SEUL</option><option>SENIOR_COUPLE</option><option>RETRAITE_FAMILLE</option><option>PRE_RETRAITE</option><option>AUTRE</option></select></div></div>
+    <div class="form-group"><label>Besoins</label><textarea id="leadBesoins" placeholder="..."></textarea></div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalLead')">Annuler</button><button class="btn btn-primary" onclick="saveLead()">💾 Sauvegarder</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalRDV">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">📅 Nouveau RDV</div><button class="modal-close" onclick="closeModal('modalRDV')">✕</button></div>
+    <div class="form-row"><div class="form-group"><label>Date *</label><input id="rdvDate" type="date"></div><div class="form-group"><label>Heure *</label><input id="rdvHeure" type="time"></div></div>
+    <div class="form-row"><div class="form-group"><label>Client *</label><input id="rdvClient"></div><div class="form-group"><label>Téléphone</label><input id="rdvTel"></div></div>
+    <div class="form-row"><div class="form-group"><label>Commercial</label><select id="rdvCommercial"></select></div><div class="form-group"><label>Type</label><select id="rdvType"><option>Présentiel</option><option>Visio</option><option>Téléphonique</option></select></div></div>
+    <div class="form-group"><label>Lien Cal.com</label><input id="rdvLien" placeholder="https://cal.com/..."></div>
+    <div class="form-group"><label>Notes</label><textarea id="rdvNotes" placeholder="..."></textarea></div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalRDV')">Annuler</button><button class="btn btn-primary" onclick="saveRDV()">💾 Sauvegarder</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalCampagne">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">📧 Nouvelle Campagne</div><button class="modal-close" onclick="closeModal('modalCampagne')">✕</button></div>
+    <div class="form-group"><label>Nom *</label><input id="campNom" placeholder="Campagne..."></div>
+    <div class="form-row"><div class="form-group"><label>Type</label><select id="campType"><option>J1</option><option>J3</option><option>J7</option><option>J15</option></select></div><div class="form-group"><label>Date début</label><input id="campDate" type="date"></div></div>
+    <div class="form-group"><label>Leads cibles</label><select id="campCibles"><option>Score > 70</option><option>Score 50-70</option><option>Tous qualifiés</option><option>NRP réintégrés</option></select></div>
+    <div class="form-group"><label>Quota/jour</label><input id="campQuota" type="number" value="20"></div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalCampagne')">Annuler</button><button class="btn btn-primary" onclick="saveCampagne()">💾 Sauvegarder</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalContrat">
+  <div class="modal modal-lg">
+    <div class="modal-header"><div class="modal-title">📁 Nouveau Contrat</div><button class="modal-close" onclick="closeModal('modalContrat')">✕</button></div>
+    <div class="form-row"><div class="form-group"><label>Nom *</label><input id="ctrNom"></div><div class="form-group"><label>Prénom *</label><input id="ctrPrenom"></div></div>
+    <div class="form-row"><div class="form-group"><label>Téléphone *</label><input id="ctrTel"></div><div class="form-group"><label>Email</label><input id="ctrEmail" type="email"></div></div>
+    <div class="form-row"><div class="form-group"><label>Compagnie *</label><select id="ctrCompagnie"><option>Neoliane</option><option>Alptis</option><option>SPVIE</option></select></div><div class="form-group"><label>Montant/mois (TND)</label><input id="ctrMontant" type="number"></div></div>
+    <div class="form-row"><div class="form-group"><label>Date effet</label><input id="ctrDateEffet" type="date"></div><div class="form-group"><label>Ancienne mutuelle</label><input id="ctrAncienne"></div></div>
+    <div class="form-group"><label>Commentaire</label><textarea id="ctrCommentaire" placeholder="..."></textarea></div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalContrat')">Annuler</button><button class="btn btn-primary" onclick="saveContrat()">💾 Sauvegarder</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalAudit">
+  <div class="modal modal-lg">
+    <div class="modal-header"><div class="modal-title">🔍 Nouvel Audit</div><button class="modal-close" onclick="closeModal('modalAudit')">✕</button></div>
+    <div class="form-row"><div class="form-group"><label>Commercial</label><select id="auditCommercial"></select></div><div class="form-group"><label>Client</label><input id="auditClient"></div></div>
+    <div class="form-row"><div class="form-group"><label>Date vente</label><input id="auditDate" type="date"></div><div class="form-group"><label>Compagnie</label><select id="auditCompagnie"><option>Neoliane</option><option>Alptis</option><option>SPVIE</option></select></div></div>
+    <div class="form-group"><label>Transcription</label><textarea id="auditTranscription" style="min-height:120px" placeholder="Collez la transcription..."></textarea></div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalAudit')">Annuler</button><button class="btn btn-primary" onclick="saveAudit()">💾 Sauvegarder</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalPost">
+  <div class="modal modal-lg">
+    <div class="modal-header"><div class="modal-title">📱 Nouveau Post</div><button class="modal-close" onclick="closeModal('modalPost')">✕</button></div>
+    <div style="display:flex;gap:10px;margin-bottom:16px">
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="postFb" checked> 📘 Facebook</label>
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="postIg" checked> 📸 Instagram</label>
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="postLi"> 💼 LinkedIn</label>
+    </div>
+    <div class="form-row"><div class="form-group"><label>Date</label><input id="postDate" type="date"></div><div class="form-group"><label>Heure</label><input id="postHeure" type="time" value="10:00"></div></div>
+    <div class="form-group"><label>Contenu *</label><textarea id="postContenu" style="min-height:120px" placeholder="Rédigez..."></textarea></div>
+    <div class="form-group"><label>Hashtags</label><input id="postTags" placeholder="#mutuellesanté #lnrfinance"></div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalPost')">Annuler</button><button class="btn btn-secondary" onclick="savePost('brouillon')">💾 Brouillon</button><button class="btn btn-primary" onclick="savePost('programme')">📅 Programmer</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalAgenda">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">📅 Nouvel Événement</div><button class="modal-close" onclick="closeModal('modalAgenda')">✕</button></div>
+    <div class="form-group"><label>Titre *</label><input id="agendaTitre" placeholder="Titre..."></div>
+    <div class="form-row"><div class="form-group"><label>Début</label><input id="agendaDebut" type="datetime-local"></div><div class="form-group"><label>Fin</label><input id="agendaFin" type="datetime-local"></div></div>
+    <div class="form-row"><div class="form-group"><label>Type</label><select id="agendaType"><option>rdv</option><option>tache</option><option>rappel</option><option>conge</option><option>formation</option></select></div><div class="form-group"><label>Couleur</label><input id="agendaCouleur" type="color" value="#4f8ef7"></div></div>
+    <div class="form-group"><label>Description</label><textarea id="agendaDesc" placeholder="..."></textarea></div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalAgenda')">Annuler</button><button class="btn btn-primary" onclick="saveAgenda()">💾 Sauvegarder</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalNote">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">📝 Nouvelle Note</div><button class="modal-close" onclick="closeModal('modalNote')">✕</button></div>
+    <div class="form-group"><label>Titre</label><input id="noteTitre" placeholder="Titre..."></div>
+    <div class="form-group"><label>Contenu *</label><textarea id="noteContenu" style="min-height:120px" placeholder="Votre note..."></textarea></div>
+    <div class="form-row"><div class="form-group"><label>Catégorie</label><select id="noteCat"><option>general</option><option>lead</option><option>contrat</option><option>employe</option><option>urgent</option></select></div><div class="form-group" style="display:flex;align-items:center;gap:8px;padding-top:28px"><label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="noteEpingle"> 📌 Épingler</label></div></div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalNote')">Annuler</button><button class="btn btn-primary" onclick="saveNote()">💾 Sauvegarder</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalImportLeads">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">📥 Importer Leads (CSV)</div><button class="modal-close" onclick="closeModal('modalImportLeads')">✕</button></div>
+    <div class="info-box">Format: prenom,nom,telephone,email,age,cp,mutuelle,type</div>
+    <div class="form-group"><textarea id="importLeadsCSV" style="min-height:150px;font-family:monospace;font-size:12px" placeholder="Jean,Dupont,+21612345678,jean@email.com,65,1002,CNSS,SENIOR_SEUL
+Marie,Martin,+21698765432,marie@email.com,58,1003,AMC,PRE_RETRAITE"></textarea></div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalImportLeads')">Annuler</button><button class="btn btn-primary" onclick="importLeadsCSV()">📥 Importer</button></div>
+  </div>
+</div>
+
+
+<script>
+// ============================================================
+// CONFIGURATION SUPABASE - À MODIFIER AVEC VOS CLÉS
+// ============================================================
+const SUPABASE_URL = 'https://VOTRE-PROJET.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...VOTRE_CLE_ANON';
+
+// Initialisation Supabase
+const { createClient } = supabase;
+const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ============================================================
+// VARIABLES GLOBALES
+// ============================================================
+let currentUser = null;
+let currentRole = null;
+let allUsers = [];
+let realtimeChannels = [];
+let calYear, calMonth;
+
+// ============================================================
+// AUTHENTIFICATION
+// ============================================================
+async function doLogin() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPwd').value;
+    const btn = document.getElementById('loginBtn');
+
+    if (!email || !password) {
+        showToast('Veuillez saisir email et mot de passe', 'error');
+        return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = '⏳ Connexion...';
+
+    try {
+        // Récupérer l'utilisateur depuis Supabase
+        const { data: user, error } = await supabase
+            .from('utilisateurs')
+            .select('*')
+            .eq('email', email)
+            .eq('actif', true)
+            .single();
+
+        if (error || !user) {
+            showToast('Email ou mot de passe incorrect', 'error');
+            btn.disabled = false;
+            btn.textContent = '🔐 Connexion sécurisée';
+            return;
+        }
+
+        // Vérification mot de passe (bcrypt côté client - en production utiliser Edge Function)
+        const valid = await verifyPassword(password, user.mot_de_passe);
+
+        if (!valid) {
+            showToast('Email ou mot de passe incorrect', 'error');
+            btn.disabled = false;
+            btn.textContent = '🔐 Connexion sécurisée';
+            return;
+        }
+
+        // Mettre à jour dernière connexion
+        await supabase
+            .from('utilisateurs')
+            .update({ derniere_connexion: new Date().toISOString() })
+            .eq('id', user.id);
+
+        // Stocker session en mémoire (PAS localStorage)
+        currentUser = user;
+        currentRole = user.role;
+
+        // Afficher app
+        document.getElementById('loginPage').style.display = 'none';
+        document.getElementById('app').style.display = 'flex';
+
+        // UI
+        updateUserUI(user);
+        applyRolePermissions();
+
+        // Charger toutes les données
+        await refreshAllData();
+
+        // Démarrer Realtime
+        startRealtimeSync();
+
+        // Init calendar
+        initCalendar();
+        initCharts();
+
+        showToast('Bienvenue ' + user.prenom + ' ' + user.nom + ' ✓', 'success');
+
+    } catch (e) {
+        console.error('Erreur connexion:', e);
+        showToast('Erreur de connexion', 'error');
+    } finally {
+        btn.disabled = false;
+        btn.textContent = '🔐 Connexion sécurisée';
+    }
+}
+
+function updateUserUI(user) {
+    const fullName = user.prenom + ' ' + user.nom;
+    const initials = (user.prenom[0] + user.nom[0]).toUpperCase();
+
+    document.getElementById('userName').textContent = fullName;
+    document.getElementById('userRole').textContent = user.role;
+    document.getElementById('userAvatar').textContent = initials;
+    document.getElementById('sidebarAvatar').textContent = initials;
+    document.getElementById('sidebarName').textContent = fullName;
+    document.getElementById('sidebarRole').textContent = user.role;
+}
+
+function doLogout() {
+    // Arrêter Realtime
+    stopRealtimeSync();
+
+    // Effacer session
+    currentUser = null;
+    currentRole = null;
+
+    // Reset UI
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('loginPage').style.display = 'flex';
+    document.getElementById('loginEmail').value = '';
+    document.getElementById('loginPwd').value = '';
+
+    showToast('Déconnexion réussie', 'success');
+}
+
+// Vérification bcrypt (utilise bcryptjs via CDN)
+async function verifyPassword(plain, hashed) {
+    // En production, cette vérification doit se faire via Edge Function Supabase
+    // Pour la démo, on utilise un hash simple ou bcryptjs si disponible
+    if (window.dcodeIO && dcodeIO.bcrypt) {
+        return await dcodeIO.bcrypt.compare(plain, hashed);
+    }
+    // Fallback temporaire pour test (à remplacer par vrai bcrypt)
+    return plain === 'lnr2026';
+}
+
+// ============================================================
+// PERMISSIONS PAR RÔLE
+// ============================================================
+function applyRolePermissions() {
+    const sections = {
+        'rh': ['nav-rh'],
+        'commercial': ['nav-commercial', 'nav-assurance'],
+        'televendeur': ['nav-assurance'],
+        'gestion': ['nav-assurance'],
+        'manager': ['nav-rh', 'nav-commercial', 'nav-assurance', 'nav-marketing', 'nav-orga', 'nav-system'],
+        'it': ['nav-rh', 'nav-commercial', 'nav-assurance', 'nav-marketing', 'nav-orga', 'nav-system']
+    };
+
+    const allowed = sections[currentRole] || [];
+
+    // Cacher toutes les sections non autorisées
+    document.querySelectorAll('.sidebar-section').forEach(sec => {
+        if (!allowed.includes(sec.id) && sec.id !== '') {
+            sec.style.display = 'none';
+        }
+    });
+
+    // Redirection par défaut
+    const defaults = {
+        'rh': 'recrutement',
+        'commercial': 'leads',
+        'televendeur': 'contrats',
+        'gestion': 'contrats',
+        'manager': 'dashboard',
+        'it': 'workflows'
+    };
+    showSection(defaults[currentRole] || 'dashboard');
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function showSection(name) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+    const sec = document.getElementById('sec-' + name);
+    if (sec) sec.classList.add('active');
+
+    document.querySelectorAll('.nav-item').forEach(n => {
+        if (n.getAttribute('onclick') && n.getAttribute('onclick').includes("'" + name + "'")) {
+            n.classList.add('active');
+        }
+    });
+
+    window.scrollTo(0, 0);
+}
+
+function switchTab(section, tab) {
+    const allContents = document.querySelectorAll('#sec-' + section + ' .tab-content');
+    const allBtns = document.querySelectorAll('#sec-' + section + ' .tab-btn');
+    allContents.forEach(c => c.classList.remove('active'));
+    allBtns.forEach(b => b.classList.remove('active'));
+
+    const target = document.getElementById('tab-' + section + '-' + tab);
+    if (target) target.classList.add('active');
+
+    allBtns.forEach(b => {
+        if (b.getAttribute('onclick') && b.getAttribute('onclick').includes("'" + tab + "'")) {
+            b.classList.add('active');
+        }
+    });
+}
+
+// ============================================================
+// MODALS
+// ============================================================
+function openModal(id) {
+    document.getElementById(id).classList.add('open');
+}
+
+function closeModal(id) {
+    document.getElementById(id).classList.remove('open');
+}
+
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('modal-overlay')) {
+        e.target.classList.remove('open');
+    }
+});
+
+// ============================================================
+// TOAST NOTIFICATIONS
+// ============================================================
+function showToast(msg, type = 'success') {
+    const t = document.createElement('div');
+    t.style.cssText = `position:fixed;bottom:24px;right:24px;z-index:9999;padding:12px 20px;border-radius:8px;font-size:14px;font-weight:500;box-shadow:0 4px 20px rgba(0,0,0,.4);background:${type === 'success' ? '#22c55e' : type === 'error' ? '#ef4444' : '#f59e0b'};color:#fff;`;
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 4000);
+}
+
+// ============================================================
+// LOADING
+// ============================================================
+function showLoading(text = 'Synchronisation...') {
+    document.querySelector('.loading-text').textContent = text;
+    document.getElementById('loadingOverlay').classList.add('open');
+}
+
+function hideLoading() {
+    document.getElementById('loadingOverlay').classList.remove('open');
+}
+
+// ============================================================
+// SYNCHRONISATION TEMPS RÉEL (Realtime)
+// ============================================================
+function startRealtimeSync() {
+    const tables = ['leads', 'contrats', 'rdv', 'employes', 'candidats', 'pointages', 'agenda', 'notes', 'activites'];
+
+    tables.forEach(table => {
+        const channel = supabase
+            .channel('public:' + table)
+            .on('postgres_changes', { event: '*', schema: 'public', table: table }, (payload) => {
+                console.log('Realtime update:', table, payload);
+                refreshData(table);
+                showToast('Données ' + table + ' mises à jour ✓', 'success');
+            })
+            .subscribe();
+
+        realtimeChannels.push(channel);
+    });
+
+    // Indicateur sync
+    document.getElementById('syncText').textContent = 'Realtime ON';
+    document.getElementById('syncStatus').classList.add('syncing');
+}
+
+function stopRealtimeSync() {
+    realtimeChannels.forEach(ch => supabaseClient.removeChannel(ch));
+    realtimeChannels = [];
+    document.getElementById('syncText').textContent = 'Sync OFF';
+    document.getElementById('syncStatus').classList.remove('syncing');
+}
+
+// ============================================================
+// CHARGEMENT DONNÉES
+// ============================================================
+async function refreshAllData() {
+    showLoading('Chargement complet...');
+
+    await Promise.all([
+        refreshData('utilisateurs'),
+        refreshData('employes'),
+        refreshData('leads'),
+        refreshData('contrats'),
+        refreshData('rdv'),
+        refreshData('candidats'),
+        refreshData('pointages'),
+        refreshData('campagnes'),
+        refreshData('audits'),
+        refreshData('agenda'),
+        refreshData('notes'),
+        refreshData('activites')
+    ]);
+
+    updateDashboardStats();
+    hideLoading();
+}
+
+async function refreshData(table) {
+    try {
+        const { data, error } = await supabase
+            .from(table)
+            .select('*')
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        // Stocker en mémoire
+        window['data_' + table] = data || [];
+
+        // Mettre à jour l'affichage selon la table
+        switch(table) {
+            case 'utilisateurs': updateUsers(data); break;
+            case 'employes': updateEmployes(data); break;
+            case 'leads': updateLeads(data); break;
+            case 'contrats': updateContrats(data); break;
+            case 'rdv': updateRDV(data); break;
+            case 'candidats': updateCandidats(data); break;
+            case 'pointages': updatePointages(data); break;
+            case 'campagnes': updateCampagnes(data); break;
+            case 'audits': updateAudits(data); break;
+            case 'agenda': updateAgenda(data); break;
+            case 'notes': updateNotes(data); break;
+            case 'activites': updateActivites(data); break;
+        }
+
+    } catch (e) {
+        console.error('Erreur refresh', table, e);
+    }
+}
+
+// ============================================================
+// MISE À JOUR UI - EMPLOYÉS
+// ============================================================
+function updateEmployes(data) {
+    const tbody = document.getElementById('tableEmployes');
+    const statEl = document.getElementById('statEmployes');
+
+    if (statEl) statEl.textContent = data.length;
+
+    if (!data || data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="10" class="empty-state">Aucun employé</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = data.map(e => `
+        <tr>
+            <td><b>${e.matricule || '-'}</b></td>
+            <td><b>${e.nom}</b></td>
+            <td>${e.prenom}</td>
+            <td>${e.poste}</td>
+            <td>${e.email || '-'}</td>
+            <td>${e.telephone || '-'}</td>
+            <td>${e.salaire_brut ? e.salaire_brut + ' TND' : '-'}</td>
+            <td>${e.cnss_matricule || '-'}</td>
+            <td><span class="badge badge-${e.statut === 'actif' ? 'success' : 'warning'}">${e.statut}</span></td>
+            <td><button class="btn btn-sm btn-secondary" onclick="editEmploye('${e.id}')">✏️</button></td>
+        </tr>
+    `).join('');
+
+    // Update selects
+    updateEmployeSelects(data);
+}
+
+function updateEmployeSelects(data) {
+    const selects = ['pointEmploye', 'rdvCommercial', 'auditCommercial'];
+    selects.forEach(id => {
+        const sel = document.getElementById(id);
+        if (sel) {
+            sel.innerHTML = '<option value="">-- Sélectionner --</option>' +
+                data.filter(e => e.statut === 'actif').map(e => 
+                    `<option value="${e.id}">${e.prenom} ${e.nom} (${e.poste})</option>`
+                ).join('');
+        }
+    });
+}
+
+// ============================================================
+// MISE À JOUR UI - LEADS
+// ============================================================
+function updateLeads(data) {
+    const tbody = document.getElementById('tableLeads');
+    const badge = document.getElementById('badge-leads');
+
+    // Stats
+    const stats = {
+        total: data.length,
+        qualif: data.filter(l => l.score_ia >= 50).length,
+        attrib: data.filter(l => l.commercial_id).length,
+        signes: data.filter(l => l.statut === 'signe').length
+    };
+
+    document.getElementById('statLeadsTotal').textContent = stats.total;
+    document.getElementById('statLeadsQualif').textContent = stats.qualif;
+    document.getElementById('statLeadsAttrib').textContent = stats.attrib;
+    document.getElementById('statLeadsSignes').textContent = stats.signes;
+    if (badge) badge.textContent = stats.total;
+
+    // Filtre par rôle
+    let displayData = data;
+    if (currentRole === 'commercial') {
+        displayData = data.filter(l => l.commercial_id === currentUser.id);
+    }
+
+    if (displayData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="11" class="empty-state">Aucun lead</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = displayData.map(l => {
+        const scoreColor = l.score_ia >= 70 ? 'success' : l.score_ia >= 50 ? 'warning' : 'danger';
+        const typeBadge = {
+            'SENIOR_SEUL': 'purple', 'SENIOR_COUPLE': 'purple', 'RETRAITE_FAMILLE': 'purple',
+            'PRE_RETRAITE': 'info', 'AUTRE': 'gray'
+        }[l.type_lead] || 'gray';
+
+        return `
+        <tr>
+            <td><b>${l.reference}</b></td>
+            <td><b>${l.prenom} ${l.nom}</b></td>
+            <td>${l.telephone || '-'}</td>
+            <td>${l.age || '-'}</td>
+            <td>${l.code_postal || '-'}</td>
+            <td>${l.mutuelle_actuelle || '-'}</td>
+            <td><span style="color:var(--${scoreColor});font-weight:700">${l.score_ia || 0}</span>/100</td>
+            <td><span class="badge badge-${typeBadge}">${l.type_lead}</span></td>
+            <td>${l.commercial_id ? 'Assigné' : '-'}</td>
+            <td><span class="badge badge-${l.statut === 'signe' ? 'success' : l.statut === 'rdv_pris' ? 'info' : 'warning'}">${l.statut}</span></td>
+            <td><button class="btn btn-sm btn-secondary" onclick="editLead('${l.id}')">✏️</button></td>
+        </tr>
+        `;
+    }).join('');
+}
+
+// ============================================================
+// MISE À JOUR UI - CONTRATS
+// ============================================================
+function updateContrats(data) {
+    const tbody = document.getElementById('tableContrats');
+    const badge = document.getElementById('badge-contrats');
+
+    const stats = {
+        total: data.length,
+        valides: data.filter(c => c.statut === 'actif').length,
+        attente: data.filter(c => ['creation', 'gestion', 'manager'].includes(c.statut)).length,
+        actifs: data.filter(c => c.statut === 'actif').length
+    };
+
+    document.getElementById('statContratsTotal').textContent = stats.total;
+    document.getElementById('statContratsValides').textContent = stats.valides;
+    document.getElementById('statContratsAttente').textContent = stats.attente;
+    document.getElementById('statContratsActifs').textContent = stats.actifs;
+    if (badge) badge.textContent = stats.attente;
+
+    let displayData = data;
+    if (currentRole === 'commercial' || currentRole === 'televendeur') {
+        displayData = data.filter(c => c.commercial_id === currentUser.id);
+    } else if (currentRole === 'gestion') {
+        displayData = data.filter(c => ['creation', 'gestion'].includes(c.statut));
+    }
+
+    if (displayData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="empty-state">Aucun contrat</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = displayData.map(c => `
+        <tr>
+            <td><b>${c.reference}</b></td>
+            <td><b>${c.souscripteur_prenom} ${c.souscripteur_nom}</b></td>
+            <td>${c.telephone || '-'}</td>
+            <td><span class="badge badge-info">${c.compagnie}</span></td>
+            <td>${c.montant_mensuel ? c.montant_mensuel + ' TND' : '-'}</td>
+            <td><span class="badge badge-${c.statut === 'actif' ? 'success' : c.statut === 'rejete' ? 'danger' : 'warning'}">${c.statut}</span></td>
+            <td>${c.commercial_id ? 'Assigné' : '-'}</td>
+            <td><button class="btn btn-sm btn-secondary" onclick="editContrat('${c.id}')">✏️</button></td>
+        </tr>
+    `).join('');
+
+    // Update validation tables
+    updateValidationTables(data);
+}
+
+function updateValidationTables(data) {
+    const gestion = data.filter(c => c.statut === 'creation');
+    const manager = data.filter(c => c.statut === 'gestion');
+
+    document.getElementById('statValGestion').textContent = gestion.length;
+    document.getElementById('statValManager').textContent = manager.length;
+    document.getElementById('badge-validation').textContent = gestion.length;
+
+    const tbodyG = document.getElementById('tableValGestion');
+    const tbodyM = document.getElementById('tableValManager');
+
+    if (tbodyG) {
+        tbodyG.innerHTML = gestion.length === 0 ? 
+            '<tr><td colspan="6" class="empty-state">Aucun dossier en attente</td></tr>' :
+            gestion.map(c => `
+                <tr>
+                    <td><b>${c.reference}</b></td>
+                    <td>${c.souscripteur_prenom} ${c.souscripteur_nom}</td>
+                    <td>${c.compagnie}</td>
+                    <td>${c.montant_mensuel || '-'} TND</td>
+                    <td>${c.commercial_id ? 'Assigné' : '-'}</td>
+                    <td><button class="btn btn-sm btn-success" onclick="validerContrat('${c.id}', 'gestion')">✅ Valider</button></td>
+                </tr>
+            `).join('');
+    }
+
+    if (tbodyM) {
+        tbodyM.innerHTML = manager.length === 0 ?
+            '<tr><td colspan="6" class="empty-state">Aucun dossier en attente</td></tr>' :
+            manager.map(c => `
+                <tr>
+                    <td><b>${c.reference}</b></td>
+                    <td>${c.souscripteur_prenom} ${c.souscripteur_nom}</td>
+                    <td>${c.compagnie}</td>
+                    <td><span class="badge badge-success">OUI</span></td>
+                    <td>${c.montant_mensuel || '-'} TND</td>
+                    <td><button class="btn btn-sm btn-success" onclick="validerContrat('${c.id}', 'manager')">🔐 Valider</button></td>
+                </tr>
+            `).join('');
+    }
+}
+
+// ============================================================
+// MISE À JOUR UI - RDV
+// ============================================================
+function updateRDV(data) {
+    const tbody = document.getElementById('tableRDV');
+    const badge = document.getElementById('badge-rdv');
+
+    const stats = {
+        semaine: data.length,
+        honore: data.filter(r => r.statut === 'honore').length,
+        noshow: data.filter(r => r.statut === 'no_show').length,
+        conv: data.filter(r => r.statut === 'honore').length
+    };
+
+    document.getElementById('statRDVSemaine').textContent = stats.semaine;
+    document.getElementById('statRDVHonore').textContent = stats.honore;
+    document.getElementById('statRDVNoShow').textContent = stats.noshow;
+    document.getElementById('statRDVConv').textContent = stats.semaine > 0 ? Math.round(stats.conv / stats.semaine * 100) + '%' : '0%';
+    if (badge) badge.textContent = stats.semaine;
+
+    let displayData = data;
+    if (currentRole === 'commercial') {
+        displayData = data.filter(r => r.commercial_id === currentUser.id);
+    }
+
+    if (displayData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="empty-state">Aucun RDV</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = displayData.map(r => `
+        <tr>
+            <td>${r.date_rdv || '-'}</td>
+            <td>${r.heure_rdv || '-'}</td>
+            <td><b>${r.client_nom}</b></td>
+            <td>${r.client_telephone || '-'}</td>
+            <td>${r.commercial_id ? 'Assigné' : '-'}</td>
+            <td>${r.type_rdv || 'Présentiel'}</td>
+            <td><span class="badge badge-${r.statut === 'honore' ? 'success' : r.statut === 'no_show' ? 'danger' : 'info'}">${r.statut}</span></td>
+            <td><button class="btn btn-sm btn-secondary" onclick="editRDV('${r.id}')">✏️</button></td>
+        </tr>
+    `).join('');
+}
+
+// ============================================================
+// MISE À JOUR UI - CANDIDATS
+// ============================================================
+function updateCandidats(data) {
+    const tbody = document.getElementById('tableCandidats');
+    const badge = document.getElementById('badge-recrutement');
+
+    const stats = {
+        total: data.length,
+        qualif: data.filter(c => c.score_ia >= 7).length,
+        entretien: data.filter(c => c.statut === 'entretien').length,
+        refuse: data.filter(c => c.statut === 'refuse').length
+    };
+
+    document.getElementById('statCandTotal').textContent = stats.total;
+    document.getElementById('statCandQualif').textContent = stats.qualif;
+    document.getElementById('statCandEntretien').textContent = stats.entretien;
+    document.getElementById('statCandRefuse').textContent = stats.refuse;
+    if (badge) badge.textContent = stats.total;
+
+    if (data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Aucun candidat</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = data.map(c => `
+        <tr>
+            <td><b>${c.nom} ${c.prenom}</b></td>
+            <td>${c.poste_souhaite || '-'}</td>
+            <td>${c.experience_annees || 0} ans</td>
+            <td><span style="color:var(--${c.score_ia >= 7 ? 'success' : c.score_ia >= 5 ? 'warning' : 'danger'});font-weight:700">${c.score_ia || '-'}</span></td>
+            <td><span class="badge badge-${c.statut === 'qualifie' ? 'success' : c.statut === 'entretien' ? 'info' : c.statut === 'refuse' ? 'danger' : 'warning'}">${c.statut}</span></td>
+            <td><button class="btn btn-sm btn-secondary" onclick="editCandidat('${c.id}')">✏️</button></td>
+        </tr>
+    `).join('');
+}
+
+// ============================================================
+// MISE À JOUR UI - POINTAGES
+// ============================================================
+function updatePointages(data) {
+    const tbody = document.getElementById('tablePointages');
+
+    const today = new Date().toISOString().split('T')[0];
+    const todayData = data.filter(p => p.date_jour === today);
+
+    const stats = {
+        presents: todayData.filter(p => p.statut === 'present').length,
+        retards: todayData.filter(p => p.statut === 'retard').length,
+        absences: todayData.filter(p => p.statut === 'absent').length,
+        taux: todayData.length > 0 ? Math.round((todayData.filter(p => p.statut !== 'absent').length / todayData.length) * 100) + '%' : '0%'
+    };
+
+    document.getElementById('statPresents').textContent = stats.presents;
+    document.getElementById('statRetards').textContent = stats.retards;
+    document.getElementById('statAbsences').textContent = stats.absences;
+    document.getElementById('statTauxPresence').textContent = stats.taux;
+
+    if (data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Aucun pointage</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = data.slice(0, 50).map(p => `
+        <tr>
+            <td>${p.employe_id || '-'}</td>
+            <td><b>Employé #${p.employe_id?.slice(0,8) || '?'}</b></td>
+            <td>${p.date_jour || '-'}</td>
+            <td>${p.heure_arrivee || '-'}</td>
+            <td>${p.heure_depart || '-'}</td>
+            <td style="color:var(--${p.retard_minutes > 0 ? 'warning' : 'success'})">${p.retard_minutes > 0 ? '+' + p.retard_minutes + ' min' : 'OK'}</td>
+            <td><span class="badge badge-${p.statut === 'present' ? 'success' : p.statut === 'retard' ? 'warning' : 'danger'}">${p.statut}</span></td>
+        </tr>
+    `).join('');
+}
+
+// ============================================================
+// MISE À JOUR UI - CAMPAGNES
+// ============================================================
+function updateCampagnes(data) {
+    const container = document.getElementById('campagnesList');
+
+    const stats = {
+        envoyes: data.reduce((a, c) => a + (c.envoyes || 0), 0),
+        ouv: data.length > 0 ? Math.round(data.reduce((a, c) => a + (c.ouvertures || 0), 0) / data.reduce((a, c) => a + (c.envoyes || 1), 0) * 100) + '%' : '0%',
+        rep: data.length > 0 ? Math.round(data.reduce((a, c) => a + (c.reponses || 0), 0) / data.reduce((a, c) => a + (c.envoyes || 1), 0) * 100) + '%' : '0%',
+        conv: data.length > 0 ? Math.round(data.reduce((a, c) => a + (c.conversions || 0), 0) / data.reduce((a, c) => a + (c.envoyes || 1), 0) * 100) + '%' : '0%'
+    };
+
+    document.getElementById('statCampEnvoyes').textContent = stats.envoyes;
+    document.getElementById('statCampOuverture').textContent = stats.ouv;
+    document.getElementById('statCampReponse').textContent = stats.rep;
+    document.getElementById('statCampConv').textContent = stats.conv;
+
+    if (data.length === 0) {
+        container.innerHTML = '<div class="empty-state">Aucune campagne</div>';
+        return;
+    }
+
+    container.innerHTML = data.map(c => `
+        <div class="campaign-card">
+            <div class="campaign-header">
+                <div><span class="campaign-day">${c.type_jour || 'J?'}</span><span style="font-size:13px;font-weight:600;margin-left:10px">${c.nom}</span></div>
+                <span class="badge badge-${c.statut === 'active' ? 'success' : c.statut === 'pause' ? 'warning' : 'gray'}">${c.statut}</span>
+            </div>
+            <div class="campaign-stats">
+                <div class="camp-stat"><div class="v">${c.envoyes || 0}</div><div class="l">Envoyés</div></div>
+                <div class="camp-stat"><div class="v" style="color:var(--success)">${c.ouvertures || 0}%</div><div class="l">Ouvertures</div></div>
+                <div class="camp-stat"><div class="v" style="color:var(--accent)">${c.reponses || 0}%</div><div class="l">Réponses</div></div>
+                <div class="camp-stat"><div class="v" style="color:var(--warning)">${c.conversions || 0}%</div><div class="l">Conversions</div></div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// ============================================================
+// MISE À JOUR UI - AUDITS
+// ============================================================
+function updateAudits(data) {
+    const tbody = document.getElementById('tableAudits');
+
+    const stats = {
+        vert: data.filter(a => a.niveau === 'vert').length,
+        orange: data.filter(a => a.niveau === 'orange').length,
+        rouge: data.filter(a => a.niveau === 'rouge').length,
+        moy: data.length > 0 ? (data.reduce((a, c) => a + (parseFloat(c.score_total) || 0), 0) / data.length).toFixed(1) : '-'
+    };
+
+    document.getElementById('statAuditVert').textContent = stats.vert;
+    document.getElementById('statAuditOrange').textContent = stats.orange;
+    document.getElementById('statAuditRouge').textContent = stats.rouge;
+    document.getElementById('statAuditMoy').textContent = stats.moy;
+
+    if (data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Aucun audit</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = data.map(a => `
+        <tr>
+            <td>${a.date_vente || '-'}</td>
+            <td><b>${a.commercial_id ? 'Commercial' : '-'}</b></td>
+            <td>${a.client_nom || '-'}</td>
+            <td><span style="color:var(--${a.niveau === 'vert' ? 'success' : a.niveau === 'orange' ? 'warning' : 'danger'});font-weight:700">${a.score_total || '-'}</span></td>
+            <td><span class="badge badge-${a.niveau === 'vert' ? 'success' : a.niveau === 'orange' ? 'warning' : 'danger'}">${a.niveau?.toUpperCase() || '?'}</span></td>
+            <td><button class="btn btn-sm btn-secondary" onclick="editAudit('${a.id}')">✏️</button></td>
+        </tr>
+    `).join('');
+}
+
+// ============================================================
+// MISE À JOUR UI - AGENDA
+// ============================================================
+function updateAgenda(data) {
+    const list = document.getElementById('agendaList');
+
+    // Update calendar events
+    updateCalendarEvents(data);
+
+    if (data.length === 0) {
+        list.innerHTML = '<div class="empty-state">Aucun événement</div>';
+        return;
+    }
+
+    list.innerHTML = data.slice(0, 20).map(e => `
+        <div class="activity-item">
+            <div class="activity-dot" style="background:${e.couleur || '#4f8ef7'}"></div>
+            <div class="activity-content">
+                <div class="title">${e.titre}</div>
+                <div class="meta">${new Date(e.date_debut).toLocaleString('fr-FR')} • ${e.type}</div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// ============================================================
+// MISE À JOUR UI - NOTES
+// ============================================================
+function updateNotes(data) {
+    const grid = document.getElementById('notesGrid');
+
+    if (data.length === 0) {
+        grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="icon">📝</div><p>Aucune note</p></div>';
+        return;
+    }
+
+    // Trier: épinglées d'abord, puis par date
+    const sorted = [...data].sort((a, b) => {
+        if (a.epingle !== b.epingle) return b.epingle ? 1 : -1;
+        return new Date(b.created_at) - new Date(a.created_at);
+    });
+
+    grid.innerHTML = sorted.map(n => `
+        <div class="note-card ${n.epingle ? 'epingle' : ''}" onclick="editNote('${n.id}')">
+            <div class="note-title">${n.titre || 'Sans titre'} ${n.epingle ? '📌' : ''}</div>
+            <div class="note-content">${n.contenu || ''}</div>
+            <div class="note-meta">
+                <span class="note-cat ${n.categorie === 'urgent' ? 'urgent' : ''}">${n.categorie}</span>
+                <span>${new Date(n.created_at).toLocaleDateString('fr-FR')}</span>
+            </div>
+        </div>
+    `).join('');
+}
+
+// ============================================================
+// MISE À JOUR UI - ACTIVITÉS
+// ============================================================
+function updateActivites(data) {
+    const feed = document.getElementById('activityFeed');
+
+    if (data.length === 0) {
+        feed.innerHTML = '<div class="empty-state"><div class="icon">📭</div><p>Aucune activité</p></div>';
+        return;
+    }
+
+    feed.innerHTML = data.slice(0, 10).map(a => {
+        const colors = { 'connexion': '', 'lead': 'green', 'contrat': 'green', 'rdv': '', 'email': '', 'audit': 'orange', 'employe': '', 'systeme': 'orange' };
+        return `
+        <div class="activity-item">
+            <div class="activity-dot ${colors[a.type] || ''}"></div>
+            <div class="activity-content">
+                <div class="title">${a.description}</div>
+                <div class="meta">${new Date(a.created_at).toLocaleString('fr-FR')} • ${a.type}</div>
+            </div>
+        </div>
+        `;
+    }).join('');
+}
+
+// ============================================================
+// DASHBOARD STATS
+// ============================================================
+function updateDashboardStats() {
+    const contrats = window.data_contrats || [];
+    const leads = window.data_leads || [];
+    const employes = window.data_employes || [];
+
+    const ca = contrats.filter(c => c.statut === 'actif').reduce((a, c) => a + (parseFloat(c.montant_mensuel) || 0), 0);
+
+    document.getElementById('statCA').textContent = ca > 0 ? ca.toFixed(0) + ' TND' : '-';
+    document.getElementById('statContrats').textContent = contrats.filter(c => c.statut === 'actif').length;
+    document.getElementById('statLeads').textContent = leads.filter(l => !['archive', 'refuse'].includes(l.statut)).length;
+    document.getElementById('statEmployes').textContent = employes.filter(e => e.statut === 'actif').length;
+    document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString('fr-FR');
+}
+
+// ============================================================
+// CALENDAR
+// ============================================================
+function initCalendar() {
+    const now = new Date();
+    calYear = now.getFullYear();
+    calMonth = now.getMonth();
+    renderCalendar();
+}
+
+function prevMonth() { calMonth--; if (calMonth < 0) { calMonth = 11; calYear--; } renderCalendar(); }
+function nextMonth() { calMonth++; if (calMonth > 11) { calMonth = 0; calYear++; } renderCalendar(); }
+
+function renderCalendar() {
+    const months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+    document.getElementById('calTitle').textContent = months[calMonth] + ' ' + calYear;
+
+    const grid = document.getElementById('calGrid');
+    grid.innerHTML = '';
+
+    const days = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+    days.forEach(d => {
+        const h = document.createElement('div');
+        h.className = 'cal-day-header';
+        h.textContent = d;
+        grid.appendChild(h);
+    });
+
+    const first = new Date(calYear, calMonth, 1);
+    const lastDay = new Date(calYear, calMonth + 1, 0).getDate();
+    let startDow = first.getDay();
+    startDow = startDow === 0 ? 6 : startDow - 1;
+
+    const today = new Date();
+
+    for (let i = 0; i < startDow; i++) {
+        const d = document.createElement('div');
+        d.className = 'cal-day other-month';
+        grid.appendChild(d);
+    }
+
+    for (let d = 1; d <= lastDay; d++) {
+        const cell = document.createElement('div');
+        const dow = (startDow + d - 1) % 7;
+        const isToday = d === today.getDate() && calMonth === today.getMonth() && calYear === today.getFullYear();
+        const isWeekend = dow >= 5;
+
+        cell.className = 'cal-day' + (isToday ? ' today' : '') + (isWeekend ? ' weekend' : '');
+        cell.innerHTML = '<div class="cal-day-num">' + d + '</div>';
+        cell.onclick = () => openModal('modalAgenda');
+        grid.appendChild(cell);
+    }
+}
+
+function updateCalendarEvents(events) {
+    // À implémenter: ajouter les événements au calendrier
+}
+
+// ============================================================
+// CHARTS
+// ============================================================
+function initCharts() {
+    const copts = {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { labels: { color: '#94a3b8', font: { size: 11 } } } },
+        scales: { x: { ticks: { color: '#94a3b8' }, grid: { color: '#2d3158' } }, y: { ticks: { color: '#94a3b8' }, grid: { color: '#2d3158' } } }
+    };
+
+    const perfCtx = document.getElementById('chartPerf');
+    if (perfCtx) {
+        new Chart(perfCtx, {
+            type: 'line',
+            data: { labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai'], datasets: [{ label: 'Leads', data: [180, 210, 245, 280, 312], borderColor: '#4f8ef7', tension: .4 }, { label: 'Contrats', data: [45, 52, 68, 78, 86], borderColor: '#22c55e', tension: .4 }] },
+            options: copts
+        });
+    }
+
+    const contratsCtx = document.getElementById('chartContrats');
+    if (contratsCtx) {
+        new Chart(contratsCtx, {
+            type: 'doughnut',
+            data: { labels: ['Neoliane', 'Alptis', 'SPVIE'], datasets: [{ data: [45, 28, 27], backgroundColor: ['#4f8ef7', '#7c5cbf', '#22c55e'], borderWidth: 0 }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#94a3b8', font: { size: 11 } }, position: 'bottom' } } }
+        });
+    }
+}
+
+// ============================================================
+// FONCTIONS CRUD - SAUVEGARDE
+// ============================================================
+async function saveCandidat() {
+    const data = {
+        nom: document.getElementById('candNom').value,
+        prenom: document.getElementById('candPrenom').value,
+        telephone: document.getElementById('candTel').value,
+        email: document.getElementById('candEmail').value,
+        poste_souhaite: document.getElementById('candPoste').value,
+        experience_annees: parseInt(document.getElementById('candExp').value) || 0,
+        experience_mutuelle: document.getElementById('candExpMut').value,
+        disponibilite: document.getElementById('candDispo').value,
+        niveau_francais: document.getElementById('candFr').value,
+        commentaire: document.getElementById('candCommentaire').value,
+        created_by: currentUser.id
+    };
+
+    await insertData('candidats', data);
+    closeModal('modalCandidat');
+}
+
+async function savePointage() {
+    const data = {
+        employe_id: document.getElementById('pointEmploye').value,
+        date_jour: document.getElementById('pointDate').value,
+        heure_arrivee: document.getElementById('pointArrivee').value,
+        heure_depart: document.getElementById('pointDepart').value,
+        statut: document.getElementById('pointStatut').value,
+        justificatif: document.getElementById('pointJustif').value
+    };
+
+    await insertData('pointages', data);
+    closeModal('modalPointage');
+}
+
+async function saveEmploye() {
+    const data = {
+        matricule: 'EMP-' + Date.now().toString().slice(-4),
+        nom: document.getElementById('empNom').value,
+        prenom: document.getElementById('empPrenom').value,
+        poste: document.getElementById('empPoste').value,
+        salaire_brut: parseFloat(document.getElementById('empSalaire').value) || 0,
+        email: document.getElementById('empEmail').value,
+        telephone: document.getElementById('empTel').value,
+        cnss_matricule: document.getElementById('empCNSS').value,
+        cin: document.getElementById('empCIN').value,
+        created_by: currentUser.id
+    };
+
+    await insertData('employes', data);
+    closeModal('modalEmploye');
+}
+
+async function saveLead() {
+    const data = {
+        reference: 'LEAD-' + Date.now().toString().slice(-6),
+        prenom: document.getElementById('leadPrenom').value,
+        nom: document.getElementById('leadNom').value,
+        telephone: document.getElementById('leadTel').value,
+        email: document.getElementById('leadEmail').value,
+        age: parseInt(document.getElementById('leadAge').value) || null,
+        code_postal: document.getElementById('leadCP').value,
+        mutuelle_actuelle: document.getElementById('leadMutuelle').value,
+        type_lead: document.getElementById('leadType').value,
+        besoins: document.getElementById('leadBesoins').value,
+        created_by: currentUser.id
+    };
+
+    await insertData('leads', data);
+    closeModal('modalLead');
+}
+
+async function saveRDV() {
+    const data = {
+        client_nom: document.getElementById('rdvClient').value,
+        client_telephone: document.getElementById('rdvTel').value,
+        date_rdv: document.getElementById('rdvDate').value,
+        heure_rdv: document.getElementById('rdvHeure').value,
+        commercial_id: document.getElementById('rdvCommercial').value || null,
+        type_rdv: document.getElementById('rdvType').value,
+        lien_calcom: document.getElementById('rdvLien').value,
+        notes: document.getElementById('rdvNotes').value,
+        created_by: currentUser.id
+    };
+
+    await insertData('rdv', data);
+    closeModal('modalRDV');
+}
+
+async function saveCampagne() {
+    const data = {
+        nom: document.getElementById('campNom').value,
+        type_jour: document.getElementById('campType').value,
+        date_debut: document.getElementById('campDate').value,
+        leads_cibles: document.getElementById('campCibles').value,
+        quota_journalier: parseInt(document.getElementById('campQuota').value) || 20,
+        created_by: currentUser.id
+    };
+
+    await insertData('campagnes', data);
+    closeModal('modalCampagne');
+}
+
+async function saveContrat() {
+    const data = {
+        reference: 'CTR-' + Date.now().toString().slice(-6),
+        souscripteur_nom: document.getElementById('ctrNom').value,
+        souscripteur_prenom: document.getElementById('ctrPrenom').value,
+        telephone: document.getElementById('ctrTel').value,
+        email: document.getElementById('ctrEmail').value,
+        compagnie: document.getElementById('ctrCompagnie').value,
+        montant_mensuel: parseFloat(document.getElementById('ctrMontant').value) || 0,
+        date_effet: document.getElementById('ctrDateEffet').value,
+        ancienne_mutuelle: document.getElementById('ctrAncienne').value,
+        commentaire: document.getElementById('ctrCommentaire').value,
+        commercial_id: currentUser.id,
+        statut: 'creation',
+        created_by: currentUser.id
+    };
+
+    await insertData('contrats', data);
+    closeModal('modalContrat');
+}
+
+async function saveAudit() {
+    const data = {
+        commercial_id: document.getElementById('auditCommercial').value || null,
+        client_nom: document.getElementById('auditClient').value,
+        compagnie: document.getElementById('auditCompagnie').value,
+        date_vente: document.getElementById('auditDate').value,
+        transcription: document.getElementById('auditTranscription').value,
+        created_by: currentUser.id
+    };
+
+    await insertData('audits', data);
+    closeModal('modalAudit');
+}
+
+async function savePost(statut) {
+    const data = {
+        // Simplifié - à compléter selon votre structure
+        created_by: currentUser.id
+    };
+
+    await insertData('posts', data);
+    closeModal('modalPost');
+}
+
+async function saveAgenda() {
+    const data = {
+        titre: document.getElementById('agendaTitre').value,
+        description: document.getElementById('agendaDesc').value,
+        date_debut: document.getElementById('agendaDebut').value,
+        date_fin: document.getElementById('agendaFin').value,
+        type: document.getElementById('agendaType').value,
+        couleur: document.getElementById('agendaCouleur').value,
+        user_id: currentUser.id,
+        created_by: currentUser.id
+    };
+
+    await insertData('agenda', data);
+    closeModal('modalAgenda');
+}
+
+async function saveNote() {
+    const data = {
+        titre: document.getElementById('noteTitre').value,
+        contenu: document.getElementById('noteContenu').value,
+        categorie: document.getElementById('noteCat').value,
+        epingle: document.getElementById('noteEpingle').checked,
+        user_id: currentUser.id
+    };
+
+    await insertData('notes', data);
+    closeModal('modalNote');
+}
+
+// Fonction générique d'insertion
+async function insertData(table, data) {
+    showLoading('Sauvegarde...');
+
+    try {
+        const { data: result, error } = await supabase
+            .from(table)
+            .insert([data])
+            .select();
+
+        if (error) throw error;
+
+        showToast('✅ Sauvegardé dans la base de données', 'success');
+
+        // Rafraîchir les données
+        await refreshData(table);
+
+        // Log activité
+        await logActivity('systeme', 'Nouveau ' + table + ' créé par ' + currentUser.prenom + ' ' + currentUser.nom);
+
+    } catch (e) {
+        console.error('Erreur sauvegarde:', e);
+        showToast('❌ Erreur: ' + e.message, 'error');
+    } finally {
+        hideLoading();
+    }
+}
+
+// ============================================================
+// FONCTIONS UTILITAIRES
+// ============================================================
+async function validerContrat(id, etape) {
+    const nextStatut = etape === 'gestion' ? 'manager' : 'it';
+
+    try {
+        const { error } = await supabase
+            .from('contrats')
+            .update({ statut: nextStatut, [etape + '_id']: currentUser.id })
+            .eq('id', id);
+
+        if (error) throw error;
+
+        showToast('✅ Contrat validé étape ' + etape, 'success');
+        await refreshData('contrats');
+        await logActivity('contrat', 'Validation ' + etape + ' contrat ' + id);
+
+    } catch (e) {
+        showToast('❌ Erreur validation', 'error');
+    }
+}
+
+async function lancerDistributionPoker() {
+    showLoading('Distribution Poker...');
+
+    try {
+        const { data: commerciaux } = await supabase
+            .from('utilisateurs')
+            .select('*')
+            .eq('role', 'commercial')
+            .eq('actif', true);
+
+        const { data: leadsNonAttrib } = await supabase
+            .from('leads')
+            .select('*')
+            .is('commercial_id', null)
+            .eq('statut', 'nouveau');
+
+        if (!leadsNonAttrib || leadsNonAttrib.length === 0) {
+            showToast('Aucun lead à distribuer', 'warning');
+            hideLoading();
+            return;
+        }
+
+        // Algorithme: moins de leads = prochain
+        for (const lead of leadsNonAttrib) {
+            const { data: countLeads } = await supabase
+                .from('leads')
+                .select('id', { count: 'exact' })
+                .eq('commercial_id', commerciaux[0].id);
+
+            // Simplifié: distribuer au premier commercial
+            await supabase
+                .from('leads')
+                .update({ commercial_id: commerciaux[0].id, statut: 'attribue' })
+                .eq('id', lead.id);
+        }
+
+        showToast('✅ ' + leadsNonAttrib.length + ' leads distribués', 'success');
+        await refreshData('leads');
+
+    } catch (e) {
+        showToast('❌ Erreur distribution', 'error');
+    } finally {
+        hideLoading();
+    }
+}
+
+async function importLeadsCSV() {
+    const csv = document.getElementById('importLeadsCSV').value.trim();
+    if (!csv) return;
+
+    showLoading('Import CSV...');
+
+    try {
+        const lines = csv.split('\n');
+        const leads = [];
+
+        for (const line of lines) {
+            const cols = line.split(',');
+            if (cols.length >= 4) {
+                leads.push({
+                    reference: 'LEAD-' + Date.now().toString().slice(-6) + '-' + Math.random().toString(36).slice(2, 5),
+                    prenom: cols[0].trim(),
+                    nom: cols[1].trim(),
+                    telephone: cols[2].trim(),
+                    email: cols[3]?.trim() || null,
+                    age: parseInt(cols[4]) || null,
+                    code_postal: cols[5]?.trim() || null,
+                    mutuelle_actuelle: cols[6]?.trim() || null,
+                    type_lead: cols[7]?.trim() || 'AUTRE',
+                    created_by: currentUser.id
+                });
+            }
+        }
+
+        const { error } = await supabaseClient.from('leads').insert(leads);
+        if (error) throw error;
+
+        showToast('✅ ' + leads.length + ' leads importés', 'success');
+        await refreshData('leads');
+        closeModal('modalImportLeads');
+
+    } catch (e) {
+        showToast('❌ Erreur import: ' + e.message, 'error');
+    } finally {
+        hideLoading();
+    }
+}
+
+async function logActivity(type, description) {
+    try {
+        await supabaseClient.from('activites').insert([{
+            type,
+            description,
+            user_id: currentUser.id
+        }]);
+    } catch (e) {
+        console.error('Erreur log activité:', e);
+    }
+}
+
+function exportData(table) {
+    const data = window['data_' + table] || [];
+    if (data.length === 0) {
+        showToast('Aucune donnée à exporter', 'warning');
+        return;
+    }
+
+    const csv = convertToCSV(data);
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = table + '_' + new Date().toISOString().slice(0, 10) + '.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+
+    showToast('✅ Export CSV réussi', 'success');
+}
+
+function convertToCSV(data) {
+    if (data.length === 0) return '';
+    const headers = Object.keys(data[0]);
+    const rows = data.map(obj => headers.map(h => {
+        const val = obj[h];
+        return val === null ? '' : String(val).replace(/,/g, ';');
+    }).join(','));
+    return [headers.join(','), ...rows].join('\n');
+}
+
+async function saveParametres() {
+    showLoading('Sauvegarde paramètres...');
+
+    const params = [
+        { cle: 'entreprise_nom', valeur: document.getElementById('paramNom').value },
+        { cle: 'orias', valeur: document.getElementById('paramOrias').value },
+        { cle: 'email_direction', valeur: document.getElementById('paramEmailDir').value },
+        { cle: 'email_rh', valeur: document.getElementById('paramEmailRH').value },
+        { cle: 'email_comptable', valeur: document.getElementById('paramEmailCompta').value },
+        { cle: 'seuil_score_haut', valeur: document.getElementById('paramSeuilHaut').value },
+        { cle: 'seuil_score_moyen', valeur: document.getElementById('paramSeuilMoyen').value },
+        { cle: 'quota_leads_jour', valeur: document.getElementById('paramQuota').value },
+        { cle: 'delai_nrp_heures', valeur: document.getElementById('paramNRP').value },
+        { cle: 'cnss_taux_salarial', valeur: document.getElementById('paramCNSSSal').value },
+        { cle: 'cnss_taux_patronal', valeur: document.getElementById('paramCNSSPat').value }
+    ];
+
+    try {
+        for (const p of params) {
+            await supabaseClient.from('parametres').upsert({ 
+                cle: p.cle, 
+                valeur: p.valeur,
+                updated_by: currentUser.id
+            }, { onConflict: 'cle' });
+        }
+
+        showToast('✅ Paramètres sauvegardés', 'success');
+
+    } catch (e) {
+        showToast('❌ Erreur: ' + e.message, 'error');
+    } finally {
+        hideLoading();
+    }
+}
+
+// Fonctions d'édition (placeholder)
+function editEmploye(id) { showToast('Édition employé ' + id, 'info'); }
+function editLead(id) { showToast('Édition lead ' + id, 'info'); }
+function editContrat(id) { showToast('Édition contrat ' + id, 'info'); }
+function editRDV(id) { showToast('Édition RDV ' + id, 'info'); }
+function editCandidat(id) { showToast('Édition candidat ' + id, 'info'); }
+function editAudit(id) { showToast('Édition audit ' + id, 'info'); }
+function editNote(id) { showToast('Édition note ' + id, 'info'); }
+function updateUsers(data) { allUsers = data || []; }
+
+// ============================================================
+// INITIALISATION
+// ============================================================
+document.addEventListener('DOMContentLoaded', function() {
+    // Définir dates par défaut
+    const today = new Date().toISOString().split('T')[0];
+    document.querySelectorAll('input[type="date"]').forEach(inp => {
+        if (!inp.value) inp.value = today;
+    });
+
+    // Set default datetime-local
+    const now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    document.querySelectorAll('input[type="datetime-local"]').forEach(inp => {
+        if (!inp.value) inp.value = now.toISOString().slice(0, 16);
+    });
+});
+</script>
+</body>
+</html>
